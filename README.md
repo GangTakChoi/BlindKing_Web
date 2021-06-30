@@ -1,4 +1,4 @@
-# web_of_choikt
+# matchmaking_web
 
 ## Project setup
 ```
