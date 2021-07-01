@@ -1,5 +1,10 @@
 <template>
   <div class="content-container">
+    <div class="d-flex justify-content-center" v-if="!isResponseComplete" style="margin-top: 100px">
+      <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
     <div class="partner-card" v-for="(partnerInfo, key) in matchingPartnerList" :key="key">
       <!-- {{
         ' 닉네임: ' + partnerInfo.nickname
@@ -98,6 +103,7 @@ export default {
   name: 'Matching',
   data: () => {
     return {
+      isResponseComplete: false,
       matchingPartnerList: [],
       getAge: (birthYear) => {
         var now = new Date();	// 현재 날짜 및 시간
@@ -111,7 +117,7 @@ export default {
   async created () {
     let response = await this.$http.get('/user/maching-partners')
     this.matchingPartnerList = response.data
-    console.log(this.matchingPartnerList[0])
+    this.isResponseComplete = true
   }
 }
 </script>
@@ -130,6 +136,7 @@ export default {
 .content-container {
   display: flex;
   flex-wrap : wrap;
+  justify-content: center;
 }
 .partner-card {
   position: relative;

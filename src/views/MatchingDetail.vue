@@ -125,7 +125,6 @@ export default {
         console.log(e)
         alert("오류가 발생하였습니다.\n문의 부탁드립니다.")
       }
-      
     })
   }
 }

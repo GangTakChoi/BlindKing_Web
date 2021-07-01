@@ -1,6 +1,11 @@
 <template>
   <div class="content-container">
-    <form @submit.prevent="saveSelfIntroduce">
+    <div class="d-flex justify-content-center" v-if="!isResponseComplete" style="margin-top: 100px">
+      <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <form @submit.prevent="saveSelfIntroduce" v-if="isResponseComplete">
       <div class="form-group">
         <label for="exampleFormControlSelect1">출생년도</label>
         <select class="form-control" id="exampleFormControlSelect1" v-model="birthYear">
@@ -68,6 +73,7 @@ export default {
   name: 'SelfIntroduction',
   data: () => {
     return {
+      isResponseComplete: false,
       birthYear: 0,
       mbti: '',
       question1: '',
@@ -123,6 +129,7 @@ export default {
           this.question5 = userInfo.question5
           this.question6 = userInfo.question6
           this.question7 = userInfo.question7
+          this.isResponseComplete = true
         }
       }).catch((error) => {
         console.log(error);
