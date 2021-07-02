@@ -40,8 +40,8 @@
         
         <div class="friend-row-button-wrap">
           <button type="button" class="btn btn-primary" @click="acceptFriend(friendInfo.objectId)">수락</button>
-          <button type="button" class="btn btn-danger">거절</button>
-          <button type="button" class="btn btn-dark">차단</button>
+          <button type="button" class="btn btn-danger" @click="rejectFriend(friendInfo.objectId)">거절</button>
+          <button type="button" class="btn btn-dark" @click="blockFriend(friendInfo.objectId)">차단</button>
         </div>
       </div>
       <div v-if="friendRequestedList.length === 0 && isResponseComplete" class="friend-info-row not-hover">
@@ -116,11 +116,29 @@ export default {
       if(!confirm("거절 하시겠습니까?")) {
         return
       }
+      this.$http.post("/user/friend/" + friendObjectId + "/reject")
+      .then((response) => {
+        alert("거절되었습니다.")
+        this.refreshData()
+      })
+      .catch((err) => {
+        alert("서버 요청중 오류가 발생하였습니다.\n다시 한번 시도해 주세요.\n문제가 지속되는 경우 문의부탁드립니다.")
+        console.log(err)
+      })
     },
-    blockFriend: function () {
+    blockFriend: function (friendObjectId) {
       if(!confirm("차단 하시겠습니까?")) {
         return
       }
+      this.$http.post("/user/friend/" + friendObjectId + "/block")
+      .then((response) => {
+        alert("차단되었습니다.")
+        this.refreshData()
+      })
+      .catch((err) => {
+        alert("서버 요청중 오류가 발생하였습니다.\n다시 한번 시도해 주세요.\n문제가 지속되는 경우 문의부탁드립니다.")
+        console.log(err)
+      })
     },
     refreshData: function () {
       this.$http.get("/user/friends")

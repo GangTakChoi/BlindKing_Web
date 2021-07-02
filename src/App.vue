@@ -60,6 +60,7 @@ export default {
 body {
   // background: #efefef;
   background: #e2e2e2;
+  // background: #f0f0f0;
 }
 
 #nav {

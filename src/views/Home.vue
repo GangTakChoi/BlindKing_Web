@@ -16,9 +16,24 @@
           친구 목록
         </button>
       </router-link>
+      <router-link to="/friends">
+        <button class="friends-button basic-button-design">
+          대화방
+        </button>
+      </router-link>
+      <router-link to="/friends">
+        <button class="friends-button basic-button-design">
+          커뮤니티
+        </button>
+      </router-link>
       <router-link to="/suggest">
         <button class="suggest-button basic-button-design">
-          건의 하기
+          내정보관리
+        </button>
+      </router-link>
+      <router-link to="/suggest">
+        <button class="suggest-button basic-button-design">
+          문의하기
         </button>
       </router-link>
       <router-link to="/donation">
