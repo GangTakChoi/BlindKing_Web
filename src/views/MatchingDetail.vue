@@ -1,6 +1,11 @@
 <template>
   <div class="content-container">
-    <div class="card">
+    <div class="d-flex justify-content-center" v-if="!isResponseComplete" style="margin-top: 100px">
+      <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div class="card" v-if="isResponseComplete">
       <table class="table table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -67,7 +72,11 @@
         <pre class="card-text">{{ q7 }}</pre>
       </div>
     </div>
-    <button type="button" class="btn btn-primary btn-lg add-friend-btn" @click="requestFriend">친구 신청</button>
+    <button v-if="isResponseComplete" ref="requestFriendButton" type="button" class="btn btn-primary btn-lg add-friend-btn" 
+      @click="requestFriend" :disabled="isRequestFriendLoading">
+      <span v-show="isRequestFriendLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      <span ref="requestFriendButtonText">친구 신청</span>
+    </button>
   </div>
 </template>
 
@@ -76,6 +85,8 @@ export default {
   name: "MatchingDetail",
   data: () => {
     return {
+      isResponseComplete: false,
+      isRequestFriendLoading: false,
       q1: "",
       q2: "",
       q3: "",
@@ -94,14 +105,35 @@ export default {
       return now.getFullYear() - birthYear + 1;
     },
     requestFriend: async function () {
-      let userId = this.$route.params.id
+      let tempButtonText = this.$refs.requestFriendButtonText.innerText
+      this.$refs.requestFriendButtonText.innerText = "Loading..."
+      this.isRequestFriendLoading = true
+
       try {
         let userId = this.$route.params.id
         let response = await this.$http.post("/user/friend/" + userId)
-        console.log(response)
+
+        let result = response.data.result
+
+        if (result === "success") {
+          alert("친구 요청이 완료되었습니다.")
+        } else if (result === "alreadyFriend") {
+          alert("이미 친구 관계입니다.")
+        } else if (result === "blocked") {
+          alert("해당 친구로 부터 차단된 상태입니다.")
+        } else if (result === "alreadyRequested") {
+          alert("이미 친구 요청이 완료된 상태입니다.")
+        } else if (result === "myBlock") {
+          alert("현재 회원님은 해당 친구를 차단해 놓은 상태입니다.\n차단 해제 후 재시도 부탁드립니다.")
+        } else if (result === "acceptFriend") {
+          alert("해당 친구도 회원님께 친구요청을 해놓은 상태임으로\n친구로 등록되었습니다.")
+        }
       } catch (err) {
         console.log(err)
         alert("오류가 발생하였습니다.\n문의 부탁드립니다.")
+      } finally {
+        this.$refs.requestFriendButtonText.innerText = tempButtonText
+        this.isRequestFriendLoading = false
       }
     }
   },
@@ -121,6 +153,7 @@ export default {
         this.age = userDetailInfo.birthYear === 0 ? "?" : this.getAge(userDetailInfo.birthYear)
         this.nickname = userDetailInfo.nickname
         this.mbti = userDetailInfo.mbti
+        this.isResponseComplete = true
       } catch (e) {
         console.log(e)
         alert("오류가 발생하였습니다.\n문의 부탁드립니다.")
@@ -131,10 +164,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.spinner-border-sm {
+  margin-right: 10px;
+  margin-bottom: 4px;
+}
 .card {
   width: 100%;
   margin-bottom: 20px;
   border-radius: 7px;
+  border: 1px solid #bdbdbd;
 }
 .card-title {
   font-weight: bold;

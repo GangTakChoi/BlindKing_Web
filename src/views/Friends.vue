@@ -13,13 +13,13 @@
     </div>
     
     <div class="friend-list-wrap" v-if="this.pageCode === FRIEND_PAGE">
-      <div class="friend-info-row" v-for="(friendInfo, key) in friendAcceptList" :key="key">
-        <span class="friend-nickname">
+      <div class="friend-info-row" v-for="(friendInfo, key) in friendAcceptList" :key="key" @click="moveFriendDetailPage(friendInfo.objectId)">
+        <span class="nickname-section">
           {{friendInfo.nickname}}
         </span>
         
         <div class="friend-row-button-wrap">
-          <button type="button" class="btn btn-primary">대화</button>
+          <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, $event)">대화</button>
         </div>
       </div>
       <div v-if="friendAcceptList.length === 0 && isResponseComplete" class="friend-info-row not-hover">
@@ -33,15 +33,15 @@
     </div>
 
     <div class="friend-list-wrap" v-if="this.pageCode === FRIEND_REQUEST_PAGE">
-      <div class="friend-info-row" v-for="(friendInfo, key) in friendRequestedList" :key="key">
-        <span class="friend-nickname">
+      <div class="friend-info-row" v-for="(friendInfo, key) in friendRequestedList" :key="key" @click="moveFriendDetailPage(friendInfo.objectId)">
+        <span>
           {{friendInfo.nickname}}
         </span>
         
         <div class="friend-row-button-wrap">
-          <button type="button" class="btn btn-primary" @click="acceptFriend(friendInfo.objectId)">수락</button>
-          <button type="button" class="btn btn-danger" @click="rejectFriend(friendInfo.objectId)">거절</button>
-          <button type="button" class="btn btn-dark" @click="blockFriend(friendInfo.objectId)">차단</button>
+          <button type="button" class="btn btn-primary" @click="acceptFriend(friendInfo.objectId, $event)">수락</button>
+          <button type="button" class="btn btn-danger" @click="rejectFriend(friendInfo.objectId, $event)">거절</button>
+          <button type="button" class="btn btn-dark" @click="blockFriend(friendInfo.objectId, $event)">차단</button>
         </div>
       </div>
       <div v-if="friendRequestedList.length === 0 && isResponseComplete" class="friend-info-row not-hover">
@@ -55,13 +55,13 @@
     </div>
 
     <div class="friend-list-wrap" v-if="this.pageCode === BLOCK_PAGE">
-      <div class="friend-info-row" v-for="(friendInfo, key) in friendBlockList" :key="key">
-        <span class="friend-nickname">
+      <div class="friend-info-row" v-for="(friendInfo, key) in friendBlockList" :key="key" @click="moveFriendDetailPage(friendInfo.objectId)">
+        <span>
           {{friendInfo.nickname}}
         </span>
         
         <div class="friend-row-button-wrap">
-          <button type="button" class="btn btn-primary">차단해제</button>
+          <button type="button" class="btn btn-primary" @click="releaseBlock(friendInfo.objectId, $event)">차단해제</button>
         </div>
       </div>
       <div v-if="friendBlockList.length === 0 && isResponseComplete" class="friend-info-row not-hover">
@@ -98,13 +98,48 @@ export default {
     }
   },
   methods: {
-    acceptFriend: function (friendObjectId) {
+    moveFriendDetailPage: function (friendObjectId) {
+      this.$router.push('/matching/detail/' + friendObjectId);
+    },
+    moveChattingRoom: function (friendObjectId, friendNickName, e) {
+      // Event Bubbling 방지
+      e.stopPropagation()
+      this.$router.push('/chatting-room/' + friendObjectId + '?nickname=' + friendNickName);
+    },
+    releaseBlock: function (friendObjectId, e) {
+      // Event Bubbling 방지
+      e.stopPropagation()
+      if(!confirm("차단해제 하시겠습니까?")) {
+        return
+      }
+
+      this.$http.post("/user/friend/" + friendObjectId + "/release-block")
+      .then((response) => {
+        if (response.status ===200) {
+          alert("차단해제 되었습니다.")
+        } else {
+          alert("유효하지 않은 요청입니다.")
+        }
+        
+        this.refreshData()
+      })
+      .catch((err) => {
+        alert("차단해제 요청중 오류가 발생하였습니다.\n다시 한번 시도해 주세요.\n문제가 지속되는 경우 문의부탁드립니다.")
+        console.log(err)
+      })
+    },
+    acceptFriend: function (friendObjectId, e) {
+      e.stopPropagation()
       if(!confirm("수락 하시겠습니까?")) {
         return
       }
       this.$http.post("/user/friend/" + friendObjectId + "/accept")
       .then((response) => {
-        alert("수락되었습니다.")
+        if (response.status ===200) {
+          alert("수락 되었습니다.")
+        } else {
+          alert("유효하지 않은 요청입니다.")
+        }
         this.refreshData()
       })
       .catch((err) => {
@@ -112,13 +147,18 @@ export default {
         console.log(err)
       })
     },
-    rejectFriend: function (friendObjectId) {
+    rejectFriend: function (friendObjectId, e) {
+      e.stopPropagation()
       if(!confirm("거절 하시겠습니까?")) {
         return
       }
       this.$http.post("/user/friend/" + friendObjectId + "/reject")
       .then((response) => {
-        alert("거절되었습니다.")
+        if (response.status ===200) {
+          alert("거절 되었습니다.")
+        } else {
+          alert("유효하지 않은 요청입니다.")
+        }
         this.refreshData()
       })
       .catch((err) => {
@@ -126,13 +166,18 @@ export default {
         console.log(err)
       })
     },
-    blockFriend: function (friendObjectId) {
+    blockFriend: function (friendObjectId, e) {
+      e.stopPropagation()
       if(!confirm("차단 하시겠습니까?")) {
         return
       }
       this.$http.post("/user/friend/" + friendObjectId + "/block")
       .then((response) => {
-        alert("차단되었습니다.")
+        if (response.status ===200) {
+          alert("차단 되었습니다.")
+        } else {
+          alert("유효하지 않은 요청입니다.")
+        }
         this.refreshData()
       })
       .catch((err) => {
@@ -167,12 +212,30 @@ export default {
     this.FRIEND_REQUEST_PAGE = FRIEND_REQUEST_PAGE
     this.BLOCK_PAGE = BLOCK_PAGE
 
-    this.refreshData()
+    let today = new Date()
+    let nowTimestamp = today.getTime()
+    let backTimestamp = Number(localStorage.getItem("뒤로가기발생시간"))
+    let savedData = localStorage.getItem(this.$route.name)
+
+    // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
+    if ( ( nowTimestamp - backTimestamp ) <= 100 && savedData !== null) {
+      Object.assign(this.$data, JSON.parse(savedData))
+      this.isResponseComplete = true
+    } else {
+      this.refreshData()
+    }
+  },
+  beforeRouteLeave (to, from, next) {
+    localStorage.setItem(this.$route.name, JSON.stringify(this.$data));
+    next()
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.nickname-section {
+  display: block;
+}
 .top-button-wrap {
   display: flex;
   flex-direction: row;
@@ -202,6 +265,7 @@ export default {
 
 .friend-list-wrap {
   margin-top: 28px;
+  border: 1px solid #bdbdbd;
 }
 
 .friend-info-row {
@@ -231,7 +295,7 @@ export default {
     right: 15px;
     top: 19px;
   }
-  .friend-nickname {
+  .friend-info-row {
     font-size: 18px;
   }
 }
@@ -253,6 +317,9 @@ export default {
   }
   .btn {
     font-size: 14px;
+  }
+  .friend-list-wrap {
+    margin-top: 16px;
   }
 }
 </style>

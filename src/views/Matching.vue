@@ -6,16 +6,6 @@
       </div>
     </div>
     <div class="partner-card" v-for="(partnerInfo, key) in matchingPartnerList" :key="key">
-      <!-- {{
-        ' 닉네임: ' + partnerInfo.nickname
-      }}
-      <br>
-      <template v-if="partnerInfo.birthYear !== 0">
-        {{
-          '나이: ' + getAge(partnerInfo.birthYear)
-        }}
-      </template>
-      <br v-else> -->
       <table class="table table-bordered">
         <thead class="thead-dark">
           <tr>
@@ -115,9 +105,25 @@ export default {
     }
   },
   async created () {
-    let response = await this.$http.get('/user/maching-partners')
-    this.matchingPartnerList = response.data
+    let today = new Date()
+    let nowTimestamp = today.getTime()
+    let backTimestamp = Number(localStorage.getItem("뒤로가기발생시간"))
+    let savedData = localStorage.getItem(this.$route.name)
+
+    // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
+    if ( ( nowTimestamp - backTimestamp ) <= 100 && savedData !== null) {
+      Object.assign(this.$data, JSON.parse(savedData))
+      this.isResponseComplete = true
+    } else {
+      let response = await this.$http.get('/user/maching-partners')
+      this.matchingPartnerList = response.data
+    }
+    
     this.isResponseComplete = true
+  },
+  beforeRouteLeave (to, from, next) {
+    localStorage.setItem(this.$route.name, JSON.stringify(this.$data));
+    next()
   }
 }
 </script>
@@ -142,7 +148,7 @@ export default {
   position: relative;
   display: inline-block;
   margin: 5px;
-  width: 30%;
+  width: 32%;
   padding: 10px;
   //border: 1px solid #000;
   border-radius: 6px;
@@ -167,7 +173,7 @@ export default {
   padding: 10px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .partner-card {
     margin: 10px 0;
     width: 100%;
