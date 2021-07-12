@@ -11,13 +11,11 @@
           {{msgInfo.message}}
         </div>
       </div>
-      <form @submit.prevent="sendMessage">
-        <div class="input-section">
-          <small id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
-          <textarea v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
-          <button class="btn btn-primary" @click="sendMessage">전송</button>
-        </div>
-      </form>
+      <div class="input-section">
+        <small id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
+        <textarea v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
+        <button class="btn btn-primary" @click="sendMessage">전송</button>
+      </div>
       
     </div>
     
@@ -71,11 +69,27 @@ export default {
 
     this.socket.emit("goInChattingRoom", goInChattingRoomRequestInfo)
 
-    this.socket.on("brodcastMessage", async (response) => {
-      let isMe = response.token === TOKEN ? true : false
+    this.socket.on("loadMessage", async (data) => {
+
+      await data.messageRecords.forEach((messaeInfo) => {
+        
+        let isMe = messaeInfo.userObjectId === data.myObjectId  ? true : false
+        let msgInfo = {
+          isMe: isMe,
+          message: messaeInfo.content
+        }
+        this.messageList.push(msgInfo)
+      })
+
+      var displayDiv = document.getElementById("chatting-message-display")
+      displayDiv.scrollTop = displayDiv.scrollHeight
+    })
+
+    this.socket.on("brodcastMessage", async (data) => {
+      let isMe = data.token === TOKEN ? true : false
       let msgInfo = {
         isMe: isMe,
-        message: response.msg
+        message: data.msg
       }
 
       await this.messageList.push(msgInfo);
