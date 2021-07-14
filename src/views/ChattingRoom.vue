@@ -13,7 +13,8 @@
       </div>
       <div class="input-section">
         <small id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
-        <textarea v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
+        <textarea v-if="!isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
+        <textarea v-else v-model="message" class="form-control" rows="3"></textarea>
         <button class="btn btn-primary" @click="sendMessage">전송</button>
       </div>
       
@@ -101,7 +102,7 @@ export default {
   beforeRouteLeave (to, from, next) {
     this.socket.disconnect()
     next()
-  }
+  },
 }
 </script>
 
@@ -115,6 +116,7 @@ export default {
   padding: 20px 30px;
   border: 0px solid #cfcfcf;
   border-radius: 5px;
+  -webkit-overflow-scrolling: touch;
 }
 .chatting-room-frame {
   position: relative;
@@ -189,17 +191,41 @@ export default {
   opacity: 0.4;
   vertical-align: sub;
 }
+
 @media (max-width: 768px) {
   #chatting-message-display {
     font-size: 14px;
+    height: 100%;
+    padding: 50px 10px 140px 10px;
   }
   .chatting-room-frame {
-    padding: 10px 10px 100px 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 10px;
+  }
+  .chatting-headline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0.7;
   }
   .form-control {
     position: absolute;
     bottom: 10px;
     width: calc(100% - 20px)
+  }
+  .input-section {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    opacity: 0.8;
+  }
+  .form-control {
+    position: unset;
   }
 }
 </style>

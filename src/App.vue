@@ -30,15 +30,16 @@
 
 <script>
 import VueCookies from 'vue-cookies'
+// import commonMixin from '@/mixin/commonMixin'
 import './assets/bootstrap-4.6.0/js/bootstrap.bundle.min.js'
 import LoginModal from '@/components/LoginModal.vue'
 
 export default {
+  // mixins: [commonMixin],
   name: 'App',
   components: { LoginModal },
   data: () => {
     return {
-      isMobile: Boolean,
       isHome: Boolean,
     }
   },
@@ -54,16 +55,12 @@ export default {
     refreshIsHome: function () {
       this.isHome = window.location.pathname === "/" ? true : false
     },
-    windowWidthResize: function (event) {
-      this.isMobile = window.innerWidth <= 768
-    }
   },
   updated () {
     this.refreshIsHome()
   },
   created () {
     this.refreshIsHome()
-    this.windowWidthResize()
 
     // 로그인 확인 요청
     this.$http.get('/verify-token').then((response) => {
