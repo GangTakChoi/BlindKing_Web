@@ -13,12 +13,7 @@
       </router-link>
       <router-link to="/friends">
         <button class="friends-button basic-button-design shadow rounded">
-          친구 목록
-        </button>
-      </router-link>
-      <router-link to="/chatting-room">
-        <button class="friends-button basic-button-design shadow rounded">
-          대화방
+          친구목록
         </button>
       </router-link>
       <router-link to="/friends">
@@ -38,7 +33,7 @@
       </router-link>
       <router-link to="/donation">
         <button class="donation-button basic-button-design shadow rounded">
-          후원 하기
+          후원하기
         </button>
       </router-link>
     </div>

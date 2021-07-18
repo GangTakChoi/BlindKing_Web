@@ -19,7 +19,10 @@
         </span>
         
         <div class="friend-row-button-wrap">
-          <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, $event)">대화</button>
+          <span v-if="friendInfo.unreadMessageCount !== 0" class="unread-count-info">{{ friendInfo.unreadMessageCount }}</span>
+          <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, key, $event)">
+            대화
+          </button>
         </div>
       </div>
       <div v-if="friendAcceptList.length === 0 && isResponseComplete" class="friend-info-row not-hover">
@@ -101,9 +104,10 @@ export default {
     moveFriendDetailPage: function (friendObjectId) {
       this.$router.push('/matching/detail/' + friendObjectId);
     },
-    moveChattingRoom: function (friendObjectId, friendNickName, e) {
+    moveChattingRoom: function (friendObjectId, friendNickName, key, e) {
       // Event Bubbling 방지
       e.stopPropagation()
+      this.friendAcceptList[key].unreadMessageCount = 0
       this.$router.push('/chatting-room/' + friendObjectId + '?nickname=' + friendNickName);
     },
     releaseBlock: function (friendObjectId, e) {
@@ -233,6 +237,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.unread-count-info {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 2px 13px;
+  border-radius: 10px;
+  margin-right: 14px;
+  background-color: #fd5f5f;
+  color: #ffffff;
+}
 .nickname-section {
   display: block;
 }
@@ -302,6 +315,10 @@ export default {
 
 
 @media (max-width: 768px) {
+  .unread-count-info {
+    padding: 3px 14px 4px 14px;
+    font-size: 14px;
+  }
   .basic-design {
     font-size: 16px;
     width: 30%;
