@@ -53,6 +53,7 @@ export default {
         if (response.status === 201) {
           alert('로그인 성공')
           this.$G.isLogin = true
+          this.$emit('loginSuccess')
           $('#close').trigger('click')
         }
       }).catch((error) => {

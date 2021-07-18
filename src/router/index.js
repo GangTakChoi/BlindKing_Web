@@ -41,6 +41,11 @@ const routes = [
     path: '/chatting-room/:friendObjectId',
     name: 'ChattingRoom',
     component: () => import(/* webpackChunkName: "chatting-room" */ '../views/ChattingRoom.vue')
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: () => import(/* webpackChunkName: "test" */ '../views/Test.vue')
   }
 ]
 

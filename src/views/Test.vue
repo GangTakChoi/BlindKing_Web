@@ -33,12 +33,30 @@
     <button type="button" class="btn btn-primary" @click="addTodo">할일 추가</button>
     <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+    <button type="button" class="btn btn-primary" id="liveToastBtn" @click="toast">Show live toast</button>
+
+    <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
+      <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
+        <div class="toast-header">
+          <!-- <img src="..." class="rounded mr-2" alt="..."> -->
+          <strong class="mr-auto">Bootstrap</strong>
+          <!-- <small>11 mins ago</small> -->
+          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import VueCookies from 'vue-cookies'
+import $ from 'jquery'
 
 export default {
   name: 'Test',
@@ -52,6 +70,14 @@ export default {
     }
   },
   methods: {
+    toast : function () {
+      console.log('test')
+      let option = {
+        delay: 3000
+      }
+      $('.toast').toast(option)
+      $('.toast').toast('show')
+    },
     test : function () {
       VueCookies.remove('token')
       console.log(VueCookies.get('token'))

@@ -11,7 +11,7 @@
           <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModal">
             로그인
           </button>
-          <LoginModal/>
+          <LoginModal @loginSuccess="chattingAlimSocketConnect"/>
         </div>
         <div v-else>
           <button type="button" class="btn btn-dark" @click="logout">
@@ -25,25 +25,60 @@
       </div>
       <router-view/>
     </div>
+    <ToastPopup :nickname="alimInfo.nickname" :message="alimInfo.message"/>
   </div>
 </template>
 
 <script>
 import VueCookies from 'vue-cookies'
-// import commonMixin from '@/mixin/commonMixin'
 import './assets/bootstrap-4.6.0/js/bootstrap.bundle.min.js'
 import LoginModal from '@/components/LoginModal.vue'
+import ToastPopup from '@/components/ToastPopup.vue'
+import io from '@/assets/js/socket.io.js'
+import $ from 'jquery'
 
 export default {
-  // mixins: [commonMixin],
   name: 'App',
-  components: { LoginModal },
+  components: { LoginModal, ToastPopup },
   data: () => {
     return {
       isHome: Boolean,
+      socket: Object,
+      alimInfo: {
+        nickname: 'test',
+        message: 'test',
+      }
     }
   },
   methods: {
+    chattingAlimSocketConnect: function () {
+      this.socket = io('/chatting-alim')
+
+      const TOKEN = VueCookies.get('token');
+
+      this.socket.emit('alimRoomOpen', TOKEN)
+
+      let that = this
+
+      this.socket.on('messageAlim', function (alimInfo) {
+        console.log(that.$route.name)
+        console.log(that.$route.params.friendObjectId)
+        console.log(alimInfo.friendObjectId)
+        if (that.$route.name === 'ChattingRoom' 
+          && that.$route.params.friendObjectId === alimInfo.friendObjectId) {
+            return
+          }
+        that.alimInfo.nickname = alimInfo.nickname
+        that.alimInfo.message = alimInfo.message
+
+        let option = {
+          // 알림메세지 떠 있는 시간
+          delay: 5000
+        }
+        $('.toast').toast(option)
+        $('.toast').toast('show')
+      })
+    },
     logout: function () {
       VueCookies.remove('token')
       alert('로그아웃 완료')
@@ -64,9 +99,9 @@ export default {
 
     // 로그인 확인 요청
     this.$http.get('/verify-token').then((response) => {
-        if (response.status === 200) {
-          this.$G.isLogin = true
-        }
+        if (response.status !== 200) return
+        this.$G.isLogin = true
+        this.chattingAlimSocketConnect()
       }).catch((error) => {
         console.log(error);
       })

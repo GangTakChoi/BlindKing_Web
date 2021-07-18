@@ -36,6 +36,11 @@
           후원하기
         </button>
       </router-link>
+      <router-link to="/test">
+        <button class="donation-button basic-button-design shadow rounded">
+          test
+        </button>
+      </router-link>
     </div>
     <div v-else>
       <div class="jumbotron jumbotron-fluid rounded">

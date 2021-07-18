@@ -69,15 +69,17 @@ export default {
     }
   },
   created () {
-    this.socket = io()
+    this.socket = io('/chatting')
 
     this.socket.on("connectSuccess", () => {
-      let goInChattingRoomRequestInfo = {
-        token: TOKEN,
-        friendObjectId: this.$route.params.friendObjectId,
+      let data = {
+        myToken: TOKEN,
+        friendObjectId: this.$route.params.friendObjectId
       }
 
-      this.socket.emit("goInChattingRoom", goInChattingRoomRequestInfo)
+      this.socket.emit("setData", data)
+
+      this.socket.emit("goInChattingRoom")
     })
 
     this.socket.on("loadMessage", async (data) => {
@@ -110,7 +112,7 @@ export default {
     })
   },
   beforeRouteLeave (to, from, next) {
-    // this.socket.disconnect()
+    this.socket.disconnect()
     next()
   },
 }
