@@ -61,9 +61,6 @@ export default {
       let that = this
 
       this.socket.on('messageAlim', function (alimInfo) {
-        console.log(that.$route.name)
-        console.log(that.$route.params.friendObjectId)
-        console.log(alimInfo.friendObjectId)
         if (that.$route.name === 'ChattingRoom' 
           && that.$route.params.friendObjectId === alimInfo.friendObjectId) {
             return

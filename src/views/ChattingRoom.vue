@@ -13,8 +13,8 @@
       </div>
       <div class="input-section">
         <small id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
-        <textarea v-if="!isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
-        <textarea v-else v-model="message" class="form-control" rows="3"></textarea>
+        <textarea :disabled="isClose" v-if="!isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
+        <textarea :disabled="isClose" v-else v-model="message" class="form-control" rows="3"></textarea>
         <button class="btn btn-primary" @click="sendMessage">전송</button>
       </div>
     </div>
@@ -41,6 +41,7 @@ export default {
       messageList: [],
       message: "",
       socket: {},
+      isClose: false,
     }
   },
   methods: {
@@ -79,10 +80,17 @@ export default {
 
       this.socket.emit("setData", data)
 
-      this.socket.emit("goInChattingRoom")
+      this.socket.on("completeSetData", () => {
+        this.socket.emit("goInChattingRoom")
+      })
     })
 
     this.socket.on("loadMessage", async (data) => {
+      this.isClose = data.isChattingRoomClose
+
+      if (this.isClose) {
+        this.message = "상대방이 채팅방을 나갔습니다."
+      }
 
       await data.messageRecords.forEach((messaeInfo) => {
         

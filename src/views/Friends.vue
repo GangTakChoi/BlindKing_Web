@@ -14,16 +14,20 @@
     
     <div class="friend-list-wrap" v-if="this.pageCode === FRIEND_PAGE">
       <div class="friend-info-row" v-for="(friendInfo, key) in friendAcceptList" :key="key" @click="moveFriendDetailPage(friendInfo.objectId)">
+      <!-- <div class="friend-info-row" v-for="(friendInfo, key) in friendAcceptList" :key="key"> -->
         <span class="nickname-section">
           {{friendInfo.nickname}}
         </span>
         
-        <div class="friend-row-button-wrap">
+        <div class="friend-row-button-wrap chatting">
           <span v-if="friendInfo.unreadMessageCount !== 0" class="unread-count-info">{{ friendInfo.unreadMessageCount }}</span>
           <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, key, $event)">
-            대화
+            대화방
           </button>
         </div>
+        <button type="button" :id="'friendDeleteButton' + key" class="close" aria-label="Close" @click="deleteFriend(friendInfo, key, $event)" data-toggle="modal" data-target="#exampleModal">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div v-if="friendAcceptList.length === 0 && isResponseComplete" class="friend-info-row not-hover">
         친구 목록이 없습니다.
@@ -77,11 +81,13 @@
       </div>
     </div>
 
-    
+    <FriendDeleteModal :friendInfo="deleteFriendInfo" @requestComplete="refreshData" />
   </div>
 </template>
 
 <script>
+import FriendDeleteModal from '@/components/FriendDeleteModal.vue'
+import $ from 'jquery'
 // 친구목록
 const FRIEND_PAGE = 0;
 // 요청목록
@@ -91,16 +97,26 @@ const BLOCK_PAGE = 2;
 
 export default {
   name: "Friends",
+  components: { FriendDeleteModal },
   data: () => {
     return {
       pageCode: FRIEND_PAGE,
       friendRequestedList: [],
       friendAcceptList: [],
       friendBlockList: [],
-      isResponseComplete: false
+      isResponseComplete: false,
+      deleteFriendInfo: {
+        nickname: ''
+      },
     }
   },
   methods: {
+    deleteFriend: function (friendInfo, key, e) {
+      e.stopPropagation()
+
+      this.deleteFriendInfo = friendInfo
+      $('#friendDeleteButton' + key).click()
+    },
     moveFriendDetailPage: function (friendObjectId) {
       this.$router.push('/matching/detail/' + friendObjectId);
     },
@@ -295,10 +311,6 @@ export default {
   position: relative;
 }
 
-.btn {
-  margin-right: 4px;
-}
-
 
 @media (min-width:768px) {
   .friend-row-button-wrap {
@@ -310,6 +322,14 @@ export default {
   }
   .friend-info-row {
     font-size: 18px;
+  }
+  .chatting {
+    right: 63px;
+  }
+  .close {
+    position: relative;
+    top: -42px;
+    right: -12px
   }
 }
 
@@ -333,10 +353,16 @@ export default {
     margin-top: 7px;
   }
   .btn {
+    margin-right: 20px;
     font-size: 14px;
   }
   .friend-list-wrap {
     margin-top: 16px;
+  }
+  .close {
+    position: relative;
+    top: -76px;
+    right: -6px
   }
 }
 </style>
