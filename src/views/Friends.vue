@@ -45,7 +45,7 @@
           {{friendInfo.nickname}}
         </span>
         
-        <div class="friend-row-button-wrap">
+        <div class="friend-row-button-wrap request-button-list">
           <button type="button" class="btn btn-primary" @click="acceptFriend(friendInfo.objectId, $event)">수락</button>
           <button type="button" class="btn btn-danger" @click="rejectFriend(friendInfo.objectId, $event)">거절</button>
           <button type="button" class="btn btn-dark" @click="blockFriend(friendInfo.objectId, $event)">차단</button>
@@ -320,6 +320,9 @@ export default {
     right: 15px;
     top: 19px;
   }
+  .request-button-list .btn:not(:last-child) {
+    margin-right: 5px;
+  }
   .friend-info-row {
     font-size: 18px;
   }
@@ -352,9 +355,11 @@ export default {
     font-size: 10px;
     margin-top: 7px;
   }
-  .btn {
+  .request-button-list .btn:not(:last-child) {
+    margin-right: 5px;
+  }
+  .chatting .btn {
     margin-right: 20px;
-    font-size: 14px;
   }
   .friend-list-wrap {
     margin-top: 16px;

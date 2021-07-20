@@ -127,6 +127,8 @@ export default {
           alert("현재 회원님은 해당 친구를 차단해 놓은 상태입니다.\n차단 해제 후 재시도 부탁드립니다.")
         } else if (result === "acceptFriend") {
           alert("해당 친구도 회원님께 친구요청을 해놓은 상태임으로\n친구로 등록되었습니다.")
+        } else if (result === "establishFriend") {
+          alert("해당 친구분은 이미 회원님을 친구로 등록해 놓은 상태임으로\n친구가 되었습니다.")
         }
       } catch (err) {
         console.log(err)

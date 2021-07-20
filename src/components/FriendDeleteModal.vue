@@ -15,8 +15,14 @@
         </div>
         <div class="modal-footer">
           <!-- <button type="button" class="btn btn-dark" data-dismiss="modal">삭제</button> -->
-          <button type="button" class="btn btn-dark" @click="deleteFriend">삭제</button>
-          <button type="button" class="btn btn-danger" @click="blockFriend">차단</button>
+          <button type="button" class="btn btn-dark" @click="deleteFriend" :disabled="isDeleteLoading">
+            <span v-show="isDeleteLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            삭제
+          </button>
+          <button type="button" class="btn btn-danger" @click="blockFriend" :disabled="isBlockLoading">
+            <span v-show="isBlockLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            차단
+          </button>
         </div>
       </div>
     </div>
@@ -28,18 +34,25 @@ import $ from 'jquery'
 
 export default {
   name: "FriendDeleteModal",
+  data: () => {
+    return {
+      isDeleteLoading: false,
+      isBlockLoading: false,
+    }
+  },
   props: {
     friendInfo: Object
   },
   methods: {
     deleteFriend: function () {
+      this.isDeleteLoading = true
       this.$http.post("/user/friend/" + this.friendInfo.objectId + "/reject")
       .then((response) => {
         if (response.status === 200) {
-          console.log(response)
+          this.isDeleteLoading = false
           alert("친구삭제 되었습니다.")
           this.$emit("requestComplete")
-          $("close").click()
+          $(".close").click()
         } else {
           alert("유효하지 않은 요청입니다.")
         }
@@ -50,13 +63,14 @@ export default {
       })
     },
     blockFriend: function () {
+      this.isBlockLoading = true
       this.$http.post("/user/friend/" + this.friendInfo.objectId + "/block")
       .then((response) => {
         if (response.status === 200) {
-          console.log(response)
+          this.isBlockLoading = false
           alert("친구차단 되었습니다.")
           this.$emit("requestComplete")
-          $("close").click()
+          $(".close").click()
         } else {
           alert("유효하지 않은 요청입니다.")
         }
@@ -71,6 +85,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.spinner-border-sm {
+  margin-right: 10px;
+  margin-bottom: 2px;
+}
 .modal-header {
   border:0;
   padding-bottom: 0;
