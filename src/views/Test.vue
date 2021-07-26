@@ -35,6 +35,13 @@
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <button type="button" class="btn btn-primary" id="liveToastBtn" @click="toast">Show live toast</button>
 
+    <div style="margin-top: 10px">
+      <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="upload">
+        <button type="submit">업로드</button>
+      </form>
+    </div>
+
     <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
       <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
         <div class="toast-header">

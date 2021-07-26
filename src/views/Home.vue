@@ -16,7 +16,7 @@
           친구목록
         </button>
       </router-link>
-      <router-link to="/friends">
+      <router-link to="/community">
         <button class="friends-button basic-button-design shadow rounded">
           커뮤니티
         </button>

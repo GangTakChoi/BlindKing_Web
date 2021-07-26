@@ -3,7 +3,7 @@
     <div id="nav">
       <div class="logo-wrap">
         <router-link to="/">
-          <img alt="logo" src="./assets/img/new-logo4.png" class="logo_img">
+          <img alt="logo" src="./assets/img/new-logo2.png" class="logo_img">
         </router-link>
       </div>
       <div class="login-wrap">
@@ -119,6 +119,8 @@ export default {
 <style lang="scss">
 @import "./assets/css/common.css";
 @import "./assets/bootstrap-4.6.0/css/bootstrap.min.css";
+@import "./assets/css/ckeditor5.css";
+
 body {
   // background: #efefef;
   // background: #e2e2e2;
@@ -133,13 +135,13 @@ body {
 
 .logo-wrap {
   height: 66px;
-  padding-left: 20px;
   display:inline-block;
 }
 
 .logo_img {
-  width: 210px;
-  margin-top: 11px;
+  width: 180px;
+  margin-top: 17px;
+  margin-left: 15px;
 }
 
 .menu-list {
