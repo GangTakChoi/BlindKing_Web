@@ -15,7 +15,7 @@
         <small id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
         <textarea :disabled="isClose" v-if="!isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
         <textarea :disabled="isClose" v-else v-model="message" class="form-control" rows="3"></textarea>
-        <button class="btn btn-primary" @click="sendMessage">전송</button>
+        <button :disabled="isClose" class="btn btn-primary" @click="sendMessage">전송</button>
       </div>
     </div>
 

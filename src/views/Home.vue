@@ -2,42 +2,42 @@
   <div class="content-container">
     <div  v-if="this.$G.isLogin">
       <router-link to="/self-introduction">
-        <button class="self-introduce-button basic-button-design shadow rounded">
+        <button class="self-introduce-button basic-button-design shadow-sm rounded">
           자기소개 작성
         </button>
       </router-link>
       <router-link to="/matching">
-        <button class="matching-button basic-button-design shadow rounded">
+        <button class="matching-button basic-button-design shadow-sm rounded">
           인연 찾기
         </button>
       </router-link>
       <router-link to="/friends">
-        <button class="friends-button basic-button-design shadow rounded">
+        <button class="friends-button basic-button-design shadow-sm rounded">
           친구목록
         </button>
       </router-link>
       <router-link to="/community">
-        <button class="friends-button basic-button-design shadow rounded">
+        <button class="friends-button basic-button-design shadow-sm rounded">
           커뮤니티
         </button>
       </router-link>
       <router-link to="/suggest">
-        <button class="suggest-button basic-button-design shadow rounded">
+        <button class="suggest-button basic-button-design shadow-sm rounded">
           내정보관리
         </button>
       </router-link>
       <router-link to="/suggest">
-        <button class="suggest-button basic-button-design shadow rounded">
+        <button class="suggest-button basic-button-design shadow-sm rounded">
           문의하기
         </button>
       </router-link>
       <router-link to="/donation">
-        <button class="donation-button basic-button-design shadow rounded">
+        <button class="donation-button basic-button-design shadow-sm rounded">
           후원하기
         </button>
       </router-link>
       <router-link to="/test">
-        <button class="donation-button basic-button-design shadow rounded">
+        <button class="donation-button basic-button-design shadow-sm rounded">
           test
         </button>
       </router-link>
@@ -91,7 +91,7 @@ export default {
 // }
 .basic-button-design {
   display: block;
-  margin: 50px auto 0 auto;
+  margin: 30px auto 0 auto;
   border: solid 0px #000;
   width: 100%;
   max-width: 1000px;

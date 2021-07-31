@@ -1,13 +1,13 @@
 <template>
   <div class="content-container">
     <div class="top-button-wrap">
-      <div class="friend-list-button basic-design" :class="{checked : this.pageCode === FRIEND_PAGE}" @click="changePage(FRIEND_PAGE)">
+      <div class="friend-list-button basic-design shadow-sm" :class="{checked : this.pageCode === FRIEND_PAGE}" @click="changePage(FRIEND_PAGE)">
         친구목록
       </div>
-      <div class="request-list-button basic-design" :class="{checked : this.pageCode === FRIEND_REQUEST_PAGE}" @click="changePage(FRIEND_REQUEST_PAGE)">
+      <div class="request-list-button basic-design shadow-sm" :class="{checked : this.pageCode === FRIEND_REQUEST_PAGE}" @click="changePage(FRIEND_REQUEST_PAGE)">
         요청목록
       </div>
-      <div class="block-list-button basic-design" :class="{checked : this.pageCode === BLOCK_PAGE}" @click="changePage(BLOCK_PAGE)">
+      <div class="block-list-button basic-design shadow-sm" :class="{checked : this.pageCode === BLOCK_PAGE}" @click="changePage(BLOCK_PAGE)">
         차단목록
       </div>
     </div>
@@ -272,18 +272,18 @@ export default {
 }
 
 .basic-design {
-  // border: 1px solid #000;
+  border: 1px solid #ebebeb;
   border-radius: 5px;
   padding: 15px;
   font-size: 18px;
   width: 32%;
   text-align: center;
   background-color:#fff;
-  box-shadow: 2px 2px 4px -2px black;
+  // box-shadow: 2px 2px 4px -2px black;
 }
 
 .basic-design:hover:not(.checked) {
-  background-color: rgb(230, 230, 230);
+  background-color: #ebebeb;
   cursor: pointer;
 }
 
@@ -294,7 +294,8 @@ export default {
 
 .friend-list-wrap {
   margin-top: 28px;
-  border: 1px solid #bdbdbd;
+  // padding: 1px;
+  border: 1px solid #c8c8c8;
 }
 
 .friend-info-row {

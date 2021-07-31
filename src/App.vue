@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <div id="nav" class="shadow-sm">
       <div class="logo-wrap">
         <router-link to="/">
           <img alt="logo" src="./assets/img/new-logo2.png" class="logo_img">
@@ -126,11 +126,19 @@ body {
   // background: #e2e2e2;
   background: #eeeef1;
   // background: #f0f0f0;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
 }
 
 #nav {
   background-color: #fff;
-  box-shadow: 0px -3px 12px;
+  // box-shadow: 0px -3px 12px;
+  // box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
 
 .logo-wrap {
@@ -170,11 +178,12 @@ body {
   .go-back {
     position: fixed;
     border: 1px solid #000;
-    bottom: 10px;
-    left: 10px;
+    bottom: 30px;
+    left: 15px;
     margin: 10px;
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
     transition-duration: 0.3s;
     background: #fff;
   }
@@ -193,15 +202,15 @@ body {
   .go-back::after {
     cursor: pointer;
     content: '';
-    width: 35px; /* 사이즈 */
-    height: 35px; /* 사이즈 */
+    width: 20px; /* 사이즈 */
+    height: 20px; /* 사이즈 */
     border-top: 1px solid #121212; /* 선 두께 */
     border-right: 1px solid #121212; /* 선 두께 */
     display: inline-block;
     transform: rotate(225deg); /* 각도 */
     position: absolute;
-    top: 40px; /* 기본 0px 값으로 해주세요 */
-    left: 49px; /* 기본 0px 값으로 해주세요 */
+    top: 30px; /* 기본 0px 값으로 해주세요 */
+    left: 35px; /* 기본 0px 값으로 해주세요 */
     transition-duration: 0.3s;
   }
 }
