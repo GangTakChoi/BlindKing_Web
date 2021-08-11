@@ -7,7 +7,10 @@
       <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" tag-name="textarea"></ckeditor>
 
       <div class="button-wrap">
-        <button type="submit" class="btn btn-primary btn-lg">등록</button>
+        <button type="submit" class="btn btn-primary btn-lg" :disabled="isRegistBoardLoading">
+          <span v-show="isRegistBoardLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          등록
+        </button>
       </div>
     </form>
   </div>
@@ -21,6 +24,7 @@ export default {
   name: "CommunityWrite",
   data: () => {
     return {
+      isRegistBoardLoading: false,
       title: '',
       editor: ClassicEditor,
       editorData: '',
@@ -71,10 +75,21 @@ export default {
   },
   methods : {
     submit () {
+      if (this.title === '') {
+        alert('제목을 입력해주세요.')
+        return
+      }
+      if (this.editorData === '') {
+        alert('내용을 입력해주세요.')
+        return
+      }
+
       let sendData = {
         title: this.title,
         content: this.editorData,
       }
+
+      this.isRegistBoardLoading = true
 
       this.$http.post('/community/board', sendData)
       .then((response) => {
@@ -90,12 +105,14 @@ export default {
     // Use the <ckeditor> component in this view.
     ckeditor: CKEditor.component
   },
-  created () {
-  }
 }
 </script>
 
 <style lang="scss" scoped>
+.spinner-border-sm {
+  margin-right: 5px;
+  margin-bottom: 4px;
+}
 .title-input-wrap {
   padding: 10px;
   background-color: white;

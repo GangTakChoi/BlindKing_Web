@@ -37,18 +37,41 @@
 
     
 
-    <div class="comment-input-section shadow">
-      <textarea class="form-control comment-textarea" row="3"></textarea>
-      <button class="btn btn-primary comment-regist-button" @click="registComment">등록</button>
+    <div v-if="isResponseComplete" class="comment-input-section shadow">
+      <textarea class="form-control comment-textarea" row="3" v-model="registCommentInput" @keyup="autoHeightTextarea"></textarea>
+      <button class="btn btn-primary comment-regist-button" @click="registComment" :disabled="!isCommentRegistButtonActivity">등록</button>
     </div>
 
-    <div class="comment-section shadow text-center">
-      <span>등록된 댓글이 없습니다.</span>
+    <div v-if="isResponseComplete" class="comment-section shadow">
+      <div v-if="isCommentRegistLoading" class="d-flex justify-content-center m-3">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <div v-if="commentInfoList.length === 0 && !isCommentRegistLoading" class="text-center">등록된 댓글이 없습니다.</div>
+
+      
+      <!-- <div v-else v-for="(commentInfo, index) in commentInfoList" :key="index" class="comment-upper-wrap"> -->
+      <div v-else v-for="(commentInfo, index) in commentInfoList" :key="index" class="comment-wrap">
+        <div class="comment-nickname">
+          {{ commentInfo.nickname }}
+        </div>
+        <div class="comment-created-date">
+          {{ getCommentDate(commentInfo.createdDate) }}
+        </div>
+        <div class="comment-content">
+          {{ commentInfo.content }}
+        </div>
+      </div>
+      <!-- </div> -->
+      
     </div>
   </div>
 </template>
 
 <script>
+import $ from 'jquery'
+
 export default {
   name: "CommunityView",
   data: () => {
@@ -58,16 +81,70 @@ export default {
       nickname: '',
       createdDate: '',
       view: '',
+      commentInfoList: [],
+      registCommentInput: '',
       like: Number,
       dislike: Number,
       isResponseComplete: false,
       isHandUp: false,
       isHandDown: false,
+      isCommentRegistLoading: false,
+      isCommentRegistButtonActivity: true,
     }
   },
   methods: {
-    registComment: function () {
+    autoHeightTextarea: function () {
+      let commentTextarea = $('.comment-textarea');
+      let scrollHeight = commentTextarea.prop('scrollHeight');
+      let innerHeight = commentTextarea.innerHeight()
 
+      if (scrollHeight > innerHeight) {
+        commentTextarea.css('height', scrollHeight + 10)
+      }
+    },
+    getCommentDate: function (timestamp) {
+      let dateInfo = this.convertDateToTimestamp(timestamp)
+      if (dateInfo.isToday) {
+        return dateInfo.hours + ':' + dateInfo.minutes
+      } else {
+        return dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day + ' ' + dateInfo.hours + ':' + dateInfo.minutes
+      }
+    },
+    registComment: function () {
+      if (this.registCommentInput === '') {
+        alert('내용을 입력해주세요.')
+        return
+      }
+
+      let postBody = {
+        content: this.registCommentInput
+      }
+
+      this.isCommentRegistLoading = true
+      this.isCommentRegistButtonActivity = false
+
+      this.$http.post('/community/board/' + this.$route.params.boardId + '/comment', postBody)
+      .then((response) => {
+        let data = response.data
+
+        if (data.result !== 'success') {
+          alert('댓글 등록 중 오류가 발생하였습니다.\n문제가 지속될 경우 문의부탁드립니다.')
+          location.reload()
+          return
+        }
+
+        this.isCommentRegistLoading = false
+        this.isCommentRegistButtonActivity = true
+        this.registCommentInput = ''
+        this.commentInfoList.unshift(data.commentInfo)
+
+        let commentTextarea = $('.comment-textarea');
+        commentTextarea.css('height', 60)
+      })
+      .catch((err) => {
+        alert('댓글 등록 중 오류가 발생하였습니다.\n문제가 지속될 경우 문의부탁드립니다.')
+        location.reload()
+      })
     },
     evaluateBoard: function (isLike) {
       let postBody = {
@@ -128,15 +205,8 @@ export default {
         this.like = responseData.like
         this.dislike = responseData.dislike
 
-        let createdDate = new Date(responseData.createdAt)
-
-        let year = createdDate.getFullYear()
-        let month = createdDate.getMonth() + 1
-        let day = createdDate.getDate()
-        let hours = createdDate.getHours()
-        let minute = createdDate.getMinutes()
-
-        this.createdDate = year + '/' + month + '/' + day + ' ' + this.fillZero(hours) + ':' + this.fillZero(minute)
+        let dateInfo = this.convertDateToTimestamp(responseData.createdAt)
+        this.createdDate = dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day + ' ' + dateInfo.hours + ':' + dateInfo.minutes
 
         if (responseData.evaluation === 'like') {
           this.isHandUp = true
@@ -144,8 +214,9 @@ export default {
           this.isHandDown = true
         }
 
+        this.commentInfoList = responseData.boardCommentInfoList
+
         this.isResponseComplete = true
-        
       })
       .catch((e) => {
         console.log(e)
@@ -161,6 +232,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.comment-wrap {
+  padding: 10px 5px;
+  .comment-nickname {
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 15px;
+    font-weight: bold;
+  }
+  .comment-created-date {
+    display: inline-block;
+    color: #b4b4b4;
+  }
+  .comment-content {
+    white-space: pre-line;
+    word-break: break-word;
+    margin-top: 10px;
+  }
+}
 .comment-section {
   background-color: #fff;
   border-radius: 5px;
@@ -177,8 +266,13 @@ export default {
   padding: 10px;
 }
 .comment-textarea {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   width: calc(100% - 80px);
   height: 62px;
+}
+.comment-textarea::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
 }
 .comment-regist-button {
   width: 70px;
@@ -204,7 +298,7 @@ hr {
 
 .add-info-section {
   position: relative;
-  top: -10px;
+  top: -14px;
   float: right;
   color: #b4b4b4;
   font-size: 0.95rem;
@@ -215,7 +309,7 @@ hr {
 }
 
 .content {
-  margin-top: 50px;
+  margin-top: 70px;
 }
 
 .hand-thumbs-wrap {

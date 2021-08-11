@@ -121,7 +121,8 @@ a:first-of-type .basic-button-design {
 //   background: #aeaeae;
 // }
 .basic-button-design:hover {
-  transform: scale(1.05);
+  // transform: scale(1.05);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
 
 @media (max-width: 768px) {

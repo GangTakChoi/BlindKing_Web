@@ -15,7 +15,7 @@
       </thead>
       <tbody>
         <tr v-for="(boardInfo, key) in boardList" :key="key" @click="moveBoardView(boardInfo.Objectid)">
-          <td scope="row">{{ boardInfo.title }}</td>
+          <td scope="row">{{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></td>
           <td>{{ boardInfo.nickname }}</td>
           <td>{{ getCreatedDate(boardInfo.createdAt) }}</td>
           <td>{{ boardInfo.view.toLocaleString('ko-KR') }}</td>
@@ -35,6 +35,37 @@
         </tr>
       </tbody>
     </table>
+    <!-- <div class="col-auto my-1">
+      <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
+      
+    </div> -->
+    <!-- <div class="input-group mb-4">
+      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
+        <option selected>선택</option>
+        <option value="1">닉네임</option>
+        <option value="2">제목</option>
+      </select>
+      <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary search-button" type="button" id="button-addon2">검색</button>
+      </div>
+    </div> -->
+    <div v-if="isResponseComplete" class="input-group mb-4">
+      <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{searchOption}}</button>
+        <div class="dropdown-menu">
+          <!-- <a class="dropdown-item" @click="selectSearchOption('닉네임')">닉네임</a> -->
+          <a class="dropdown-item" @click="selectSearchOption('제목')">제목</a>
+          <a class="dropdown-item" @click="selectSearchOption('내용')">내용</a>
+          <a class="dropdown-item" @click="selectSearchOption('제목+내용')">제목+내용</a>
+        </div>
+      </div>
+      <input v-model="searchContent" type="text" class="form-control" aria-label="Text input with dropdown button">
+      <div class="input-group-append">
+        <button @click="searchBoard" class="btn btn-outline-secondary search-button" type="button" id="button-addon2">검색</button>
+      </div>
+    </div>
+
     <nav v-if="pageNumberList.length !== 0" aria-label="Page navigation example">
       <ul class="pagination">
         <li class="page-item" :class="{ disabled : minPage === 1 }" @click="previousPagination">
@@ -71,31 +102,65 @@ export default {
       minPage: 1,
       maxPage: PAGE_COUNT,
       isNextPageButtonActive: false,
+      searchOption: '선택',
+      searchContent: '',
     }
   },
   methods: {
-    fillZero: function (num) {
-      if (num < 10) {
-        return '0' + String(num)
-      } else {
-        return String(num)
+    searchBoard: function () {
+      if (this.searchOption === '선택') {
+        alert('옵션을 선택해주세요.')
+        return
       }
+      if (this.searchContent === '') {
+        alert('검색 내용을 입력해주세요.')
+        return
+      }
+      if (this.searchContent.length < 2) {
+        alert('2글자 이상 검색어를 입력해주세요.')
+        return
+      }
+
+      this.loadData(true)
+
+      // let searchOption = this.searchOption === '닉네임' ? 'nickname' : 'title'
+
+      // this.$http.get('/community/board-list?\
+      // page=' + this.currentPage + 
+      // '&countPerPage=' + COUNT_PER_PAGE +
+      // '&searchOption=' + searchOption +
+      // '&searchContent=' + this.searchContent)
+      // .then((response) => {
+      //   console.log(response.data.searchOption)
+      //   console.log(response.data.searchContent)
+      //   // this.isResponseComplete = true
+      //   // this.boardList = response.data.boardList
+      //   // let lastPageNumber = response.data.lastPageNumber
+
+        
+      //   // if (this.maxPage >= lastPageNumber) {
+      //   //   this.maxPage = lastPageNumber
+      //   //   this.isNextPageButtonActive = false
+      //   // }
+
+      //   // this.loadPaginationNumber()
+      // })
+      // .catch((err) => {
+      //   console.log(err)
+      //   alert('에러발생')
+      // })
+    },
+    selectSearchOption: function (option) {
+      this.searchOption = option
     },
     getCreatedDate: function (createdAt) {
-      let nowDate = new Date()
-      let createdDate = new Date(createdAt)
+      let dateInfo = this.convertDateToTimestamp(createdAt)
 
-      if (
-        nowDate.getFullYear() === createdDate.getFullYear() &&
-        nowDate.getMonth() === createdDate.getMonth() &&
-        nowDate.getDate() === createdDate.getDate()
-      ) {
-        return this.fillZero(createdDate.getHours()) + ':' + this.fillZero(createdDate.getMinutes())
+      if (dateInfo.isToday) {
+        return dateInfo.hours + ':' + dateInfo.minutes
       } else {
-        return createdDate.getFullYear() + '/' + this.fillZero((createdDate.getMonth() + 1)) + '/' + this.fillZero(createdDate.getDate())
+        return dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day
       }
-
-      
     },
     moveWritePage: function () {
       this.$router.push('/community-write');
@@ -109,8 +174,26 @@ export default {
       this.boardList = []
       this.loadData()
     },
-    loadData: function () {
-      this.$http.get('/community/board-list?page=' + this.currentPage + '&countPerPage=' + COUNT_PER_PAGE)
+    loadData: function (isSearch) {
+      let requestUrl
+
+      if (isSearch) {
+        let searchOption
+        if (this.searchOption === '닉네임') searchOption = 'nickname'
+        else if (this.searchOption === '제목') searchOption = 'title'
+        else if (this.searchOption === '내용') searchOption = 'content'
+        else if (this.searchOption === '제목+내용') searchOption = 'title+content'
+
+        requestUrl = '/community/board-list?' +
+        'page=' + this.currentPage + 
+        '&countPerPage=' + COUNT_PER_PAGE +
+        '&searchOption=' + searchOption +
+        '&searchContent=' + this.searchContent
+      } else {
+        requestUrl = '/community/board-list?page=' + this.currentPage + '&countPerPage=' + COUNT_PER_PAGE
+      }
+
+      this.$http.get(requestUrl)
       .then((response) => {
         this.isResponseComplete = true
         this.boardList = response.data.boardList
@@ -163,13 +246,16 @@ export default {
 .content-container {
   // width: 90%;
 }
+.input-group {
+  background-color: #fff;
+}
 .button-wrap {
   width: 100%;
   text-align: right;
 }
 .table {
   margin-top: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   thead {
     font-size: 14px;
     text-align: center;
@@ -189,6 +275,11 @@ export default {
   }
   .title {
     width: auto;
+  }
+  .comment-count {
+    display: inline-block;
+    margin-left: 5px;
+    color: #a5a5a5;
   }
   .views, .like, .nickname, .created {
     width: 63px;
