@@ -35,22 +35,8 @@
         </tr>
       </tbody>
     </table>
-    <!-- <div class="col-auto my-1">
-      <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Preference</label>
-      
-    </div> -->
-    <!-- <div class="input-group mb-4">
-      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
-        <option selected>선택</option>
-        <option value="1">닉네임</option>
-        <option value="2">제목</option>
-      </select>
-      <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-outline-secondary search-button" type="button" id="button-addon2">검색</button>
-      </div>
-    </div> -->
-    <div v-if="isResponseComplete" class="input-group mb-4">
+    
+    <div v-if="isResponseComplete" class="input-group">
       <div class="input-group-prepend">
         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{searchOption}}</button>
         <div class="dropdown-menu">
@@ -122,33 +108,6 @@ export default {
       }
 
       this.loadData(true)
-
-      // let searchOption = this.searchOption === '닉네임' ? 'nickname' : 'title'
-
-      // this.$http.get('/community/board-list?\
-      // page=' + this.currentPage + 
-      // '&countPerPage=' + COUNT_PER_PAGE +
-      // '&searchOption=' + searchOption +
-      // '&searchContent=' + this.searchContent)
-      // .then((response) => {
-      //   console.log(response.data.searchOption)
-      //   console.log(response.data.searchContent)
-      //   // this.isResponseComplete = true
-      //   // this.boardList = response.data.boardList
-      //   // let lastPageNumber = response.data.lastPageNumber
-
-        
-      //   // if (this.maxPage >= lastPageNumber) {
-      //   //   this.maxPage = lastPageNumber
-      //   //   this.isNextPageButtonActive = false
-      //   // }
-
-      //   // this.loadPaginationNumber()
-      // })
-      // .catch((err) => {
-      //   console.log(err)
-      //   alert('에러발생')
-      // })
     },
     selectSearchOption: function (option) {
       this.searchOption = option
@@ -248,6 +207,7 @@ export default {
 }
 .input-group {
   background-color: #fff;
+  margin-bottom: 20px;
 }
 .button-wrap {
   width: 100%;

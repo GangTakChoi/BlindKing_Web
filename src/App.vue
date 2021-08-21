@@ -91,7 +91,7 @@ export default {
   updated () {
     this.refreshIsHome()
   },
-  created () {
+  async created () {
     this.refreshIsHome()
 
     // 로그인 확인 요청
@@ -100,7 +100,7 @@ export default {
         this.$G.isLogin = true
         this.chattingAlimSocketConnect()
       }).catch((error) => {
-        console.log(error);
+        console.log(error)
       })
 
     // 뒤로가기 이벤트 발생시

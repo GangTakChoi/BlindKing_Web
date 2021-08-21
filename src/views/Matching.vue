@@ -5,85 +5,73 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div class="partner-card" v-for="(partnerInfo, key) in matchingPartnerList" :key="key">
-      <table class="table table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th scope="col">닉네임</th>
-            <th scope="col">나이</th>
-            <th scope="col">MBTI</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td scope="row">{{ partnerInfo.nickname }}</td>
-            <td>{{ partnerInfo.birthYear === 0 ? "?" : getAge(partnerInfo.birthYear) }}</td>
-            <td>{{ partnerInfo.mbti === "" ? "?" : partnerInfo.mbti }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div v-if="partnerInfo.question1.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 자신과 성격이 닮은 동물은?'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question1 }}</pre>
+    <div class="search-wrap shadow-sm" v-if="isResponseComplete">
+      <div class="line-wrap">
+        <label class="custom-label" for="inlineFormCustomSelectPref">지역</label>
+        <select class="custom-select" id="inlineFormCustomSelectPref">
+          <option selected>무관</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
       </div>
-
-      <div v-if="partnerInfo.question2.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 위와 같이 생각하는 이유는 무엇인가요?'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question2 }}</pre>
+      
+      <div class="line-wrap">
+        <label class="custom-label" for="inlineFormCustomSelectPref">MBTI</label>
+        <select class="custom-select" id="inlineFormCustomSelectPref">
+          <option selected>무관</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
       </div>
-
-      <div v-if="partnerInfo.question3.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 선호하는 스트레스 해소법은?'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question3 }}</pre>
+      <div class="line-wrap">
+        <label class="custom-label" for="inlineFormCustomSelectPref">나이</label>
+        <select class="custom-select age-select" id="inlineFormCustomSelectPref">
+          <option selected>무관</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+        ~
+        <select class="custom-select age-select" id="inlineFormCustomSelectPref">
+          <option selected>무관</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
       </div>
-      <div v-if="partnerInfo.question4.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 본인은 좋아하는 이성에게 어떻게 행동하나요?'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question4 }}</pre>
+      <button type="submit" class="btn btn-info btn-block search-button">검색</button>
+    </div>
+    <div class="card-container">
+      <div class="partner-card" v-for="(partnerInfo, key) in matchingPartnerList" :key="key">
+        <table class="table table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">닉네임</th>
+              <th scope="col">나이</th>
+              <th scope="col">MBTI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">{{ partnerInfo.nickname }}</td>
+              <td>{{ partnerInfo.birthYear === 0 ? "?" : getAge(partnerInfo.birthYear) }}</td>
+              <td>{{ partnerInfo.mbti === "" ? "?" : partnerInfo.mbti }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <template v-for="(questionInfo, index) in partnerInfo.questionList">
+          <div v-if="questionInfo.answer.trim()" class="partner-card-body" :key="index">
+            <div class="question-section">{{ questionInfo.questionId.content }}</div>
+            <pre class="answer-section">{{ questionInfo.answer }}</pre>
+          </div>
+        </template>
+        <div class="detail-btn-blank"></div>
+        <router-link :to="getDetailLink(partnerInfo._id)">
+          <button type="submit" class="btn btn-primary btn-lg btn-block detail-btn">자세히 보기</button>
+        </router-link>
       </div>
-      <div v-if="partnerInfo.question5.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 만약 연인이 생긴다면 가고 싶은 곳이나 하고 싶은 것은 무엇이 있나요?'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question5 }}</pre>
-      </div>
-      <div v-if="partnerInfo.question6.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 왜 연애를 하려고 하나요?'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question6 }}</pre>
-      </div>
-      <div v-if="partnerInfo.question7.trim()" class="partner-card-body">
-        <div class="question-section">
-        {{
-          'Q) 그 외 본인의 상태나 상황, 자신에 대한 솔직한 얘기를 마음 것 적어보세요.'
-        }}
-        </div>
-        <pre class="answer-section">{{ partnerInfo.question7 }}</pre>
-      </div>
-      <div class="detail-btn-blank"></div>
-      <router-link :to="getDetailLink(partnerInfo._id)">
-        <button type="submit" class="btn btn-primary btn-lg btn-block detail-btn">자세히 보기</button>
-      </router-link>
     </div>
   </div>
 </template>
@@ -93,6 +81,7 @@ export default {
   name: 'Matching',
   data: () => {
     return {
+      isShowRegionSelectBox: false,
       isResponseComplete: false,
       matchingPartnerList: [],
       getAge: (birthYear) => {
@@ -129,6 +118,45 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.search-button {
+  margin-top: 15px;
+  font-size: 18px;
+}
+.line-wrap:not(:first-child) {
+  margin-top: 15px;
+}
+.custom-label {
+  display: inline-block;
+  width: 50px;
+  margin-right: 15px;
+}
+.custom-select {
+  vertical-align: baseline;
+  display: inline-block;
+  width: 200px;
+}
+.region-select-box {
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 10px;
+}
+.region-select-button {
+  cursor: pointer;
+  background-color: #000;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  color: white;
+}
+.search-wrap {
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 18px 12px 14px 12px;
+  width: 100%;
+  margin-bottom: 20px;
+  border: 1px solid #bdbdbd;
+}
 .detail-btn {
   position: absolute;
   bottom: 10px;
@@ -139,18 +167,18 @@ export default {
 .detail-btn-blank {
   height: 60px;
 }
-.content-container {
+.card-container {
   display: flex;
   flex-wrap : wrap;
-  justify-content: center;
+  justify-content: space-between;
+  flex-direction: row;
 }
 .partner-card {
   position: relative;
   display: inline-block;
-  margin: 5px;
-  width: 32%;
+  margin-bottom: 7px;
+  width: 33%;
   padding: 10px;
-  //border: 1px solid #000;
   border-radius: 6px;
   background-color: #fff;
   box-shadow: 0px 1px 5px -2px;
@@ -158,8 +186,6 @@ export default {
 .table {
   text-align: center;
   margin-bottom: 21px;
-}
-.partner-card-body {
 }
 .question-section {
   font-weight: bold;
@@ -175,8 +201,14 @@ export default {
 
 @media (max-width: 1200px) {
   .partner-card {
-    margin: 10px 0;
+    margin-bottom: 10px;
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .age-select {
+    width: 30%;
   }
 }
 </style>

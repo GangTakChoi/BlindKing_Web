@@ -59,21 +59,27 @@
         <div class="comment-created-date">
           {{ getCommentDate(commentInfo.createdDate) }}
         </div>
+        <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + index" type="button" class="close" aria-label="Close" @click="deleteComment(commentInfo, index, $event)" data-toggle="modal" data-target="#exampleModal">
+          <span aria-hidden="true">&times;</span>
+        </button>
         <div class="comment-content">
           {{ commentInfo.content }}
         </div>
       </div>
       <!-- </div> -->
-      
+
+      <CommentDeleteModal :commentInfo="deleteCommentInfo" :boardId="$route.params.boardId" @commentDeleteComplete="commentDeleteComplete" />
     </div>
   </div>
 </template>
 
 <script>
+import CommentDeleteModal from '@/components/CommentDeleteModal.vue'
 import $ from 'jquery'
 
 export default {
   name: "CommunityView",
+  components: { CommentDeleteModal },
   data: () => {
     return {
       title: '',
@@ -83,16 +89,32 @@ export default {
       view: '',
       commentInfoList: [],
       registCommentInput: '',
-      like: Number,
-      dislike: Number,
       isResponseComplete: false,
       isHandUp: false,
       isHandDown: false,
       isCommentRegistLoading: false,
       isCommentRegistButtonActivity: true,
+      deleteCommentInfo: {},
+      like: Number,
+      dislike: Number,
     }
   },
   methods: {
+    commentDeleteComplete: function (commmentId) {
+      const delectCommentIndex = this.commentInfoList.findIndex(
+        (commentInfo) =>{
+          return commentInfo.objectId === commmentId
+        }
+      )
+
+      this.commentInfoList.splice(delectCommentIndex, 1)
+    },
+    deleteComment: function (commentInfo, index, e) {
+      e.stopPropagation()
+      this.deleteCommentInfo = commentInfo
+
+      $('#deleteCommentButton' + index).click()
+    },
     autoHeightTextarea: function () {
       let commentTextarea = $('.comment-textarea');
       let scrollHeight = commentTextarea.prop('scrollHeight');
@@ -109,6 +131,9 @@ export default {
       } else {
         return dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day + ' ' + dateInfo.hours + ':' + dateInfo.minutes
       }
+    },
+    refreshData: function () {
+
     },
     registComment: function () {
       if (this.registCommentInput === '') {
@@ -332,6 +357,12 @@ hr {
 
 .hand-thumbs-up-wrap {
   margin-right: 20px;
+}
+
+.close {
+  position: relative;
+  top: -2px;
+  right: 5px
 }
 
 @media (max-width: 768px) {

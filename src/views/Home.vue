@@ -1,6 +1,11 @@
 <template>
   <div class="content-container">
     <div  v-if="this.$G.isLogin">
+      <router-link to="/">
+        <button class="macthing-active-button basic-button-design shadow-sm rounded" @click="isMaching = !isMaching">
+          매칭 활성화 <span class="on-off-button">{{ isMaching ? 'on' : 'off' }}</span>
+        </button>
+      </router-link>
       <router-link to="/self-introduction">
         <button class="self-introduce-button basic-button-design shadow-sm rounded">
           자기소개 작성
@@ -62,6 +67,11 @@
 <script>
 export default {
   name: 'Home',
+  data: () => {
+    return {
+      isMaching: true,
+    }
+  }
 }
 </script>
 
@@ -70,25 +80,11 @@ export default {
 .lead {
   margin-top: 50px;
 }
-
 .jumbotron-fluid {
   padding-left: 20px;
   padding-right: 20px;
   background-color: #dae0e5;
 }
-
-// .basic-button-design {
-//   display: block;
-//   margin: 20px auto 0 auto;
-//   border: 0;
-//   width: 100%;
-//   height: 66px;
-//   border-radius: 40px;
-//   font-size: 25px;
-//   color: #fff;
-//   transition-duration: 0.4s;
-//   box-shadow: 2px 2px 8px -2px black;
-// }
 .basic-button-design {
   display: block;
   margin: 30px auto 0 auto;
@@ -105,23 +101,29 @@ export default {
 a:first-of-type .basic-button-design {
   margin-top: 0;
 }
-// .self-introduce-button {
-//   background: #3c3c3c;
-// }
-// .matching-button {
-//   background: #ff7e7e;
-// }
-// .donation-button {
-//   background: #6183ff;
-// }
-// .friends-button {
-//   background: #66ce5e;
-// }
-// .suggest-button {
-//   background: #aeaeae;
-// }
+.on-off-button {
+  position: relative;
+  top: -2px;
+  display: inline-block;
+  height: 25px;
+  line-height: 23px;
+  margin-left: 10px;
+  font-size: 16px;
+  padding: 0 10px;
+  border-radius: 3px;
+  background-color: #dadada;
+  color: #000000;
+}
+.macthing-active-button {
+  color: #ffffff;
+  background-color: #000000;
+  // border: 1px solid #c7c7c7;
+  // background-color:#87c2ff; //남 
+  // background-color:#c2e0ff; //남 
+  // background-color:#ffd6da; //여
+  // background-color:#ffbcc2;
+}
 .basic-button-design:hover {
-  // transform: scale(1.05);
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
 
