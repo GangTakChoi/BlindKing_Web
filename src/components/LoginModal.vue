@@ -55,6 +55,7 @@ export default {
           this.$G.isLogin = true
           this.$emit('loginSuccess')
           $('#close').trigger('click')
+          location.reload()
         }
       }).catch((error) => {
         alert('로그인 실패')

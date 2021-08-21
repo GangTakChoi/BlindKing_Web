@@ -57,7 +57,7 @@
             <tr>
               <td scope="row">{{ partnerInfo.nickname }}</td>
               <td>{{ partnerInfo.birthYear === 0 ? "?" : getAge(partnerInfo.birthYear) }}</td>
-              <td>{{ partnerInfo.mbti === "" ? "?" : partnerInfo.mbti }}</td>
+              <td>{{ partnerInfo.mbti === "unkown" ? "?" : partnerInfo.mbti }}</td>
             </tr>
           </tbody>
         </table>

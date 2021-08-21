@@ -16,8 +16,7 @@
       <div class="form-group">
         <label for="exampleFormControlSelect1">MBTI <a href="https://www.16personalities.com/ko/%EB%AC%B4%EB%A3%8C-%EC%84%B1%EA%B2%A9-%EC%9C%A0%ED%98%95-%EA%B2%80%EC%82%AC" target="_blank">성격유형검사↗️</a></label>
         <select class="form-control" id="exampleFormControlSelect1" v-model="userMBTI">
-          <option value="">모르겠어요</option>
-          <option v-for="(mbtiInfo, index) in mbtiList" :key="index" :value="mbtiInfo">{{mbtiInfo}}</option>
+          <option v-for="(mbtiInfo, index) in mbtiList" :key="index" :value="mbtiInfo">{{mbtiInfo === 'unkown' ? '모르겠어요' : mbtiInfo}}</option>
         </select>
       </div>
 
@@ -38,7 +37,7 @@
         <textarea v-else class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
       </div>
       
-      <button type="submit" class="btn btn-primary btn-lg btn-block complete-btn">작성완료</button>
+      <button type="submit" class="btn btn-primary btn-lg btn-block complete-btn" :disabled="isSaving">작성완료</button>
     </form>
   </div>
 </template>
@@ -48,6 +47,7 @@ export default {
   name: 'SelfIntroduction',
   data: () => {
     return {
+      isSaving: false,
       mbtiList: [],
       selectUpperAreaCode: '',
       selectSubAreaCode: '',
@@ -82,11 +82,18 @@ export default {
         reqBody.subAreaCode = this.selectSubAreaCode
       }
 
+      let questionListUpdateInfo = []
+
       this.questionList.forEach((element, index) => {
-        this.questionList[index].questionId = element.questionId._id
+        questionListUpdateInfo[index] = {
+          answer: element.answer,
+          questionId: element.questionId._id
+        }
       })
 
-      reqBody.questionList = this.questionList
+      reqBody.questionList = questionListUpdateInfo
+
+      this.isSaving = true
 
       // 자기소개 정보 등록
       this.$http.post('/user/self-introduction', reqBody).then((response) => {

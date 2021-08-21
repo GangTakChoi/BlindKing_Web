@@ -2,8 +2,14 @@
   <div class="content-container">
     <div  v-if="this.$G.isLogin">
       <router-link to="/">
-        <button class="macthing-active-button basic-button-design shadow-sm rounded" @click="isMaching = !isMaching">
-          매칭 활성화 <span class="on-off-button">{{ isMaching ? 'on' : 'off' }}</span>
+        <button class="macthing-active-button basic-button-design shadow-sm rounded" @click="activeMatching" :disabled="isLoadActiveMatching">
+          매칭 활성화 
+          <span class="on-off-button" :class="{ 'macthing-on-status-style': isMatchingOnStyle, 'macthing-off-status-style': isMatchingOffStyle }">
+            <div v-if="isLoadActiveMatching" class="spinner-border" role="status" style="width: 1.1rem; height: 1.1rem;">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <span v-if="!isLoadActiveMatching">{{ isActiveMatching ? 'ON' : 'OFF' }}</span>
+          </span>
         </button>
       </router-link>
       <router-link to="/self-introduction">
@@ -65,13 +71,50 @@
 </template>
 
 <script>
+import VueCookies from 'vue-cookies'
+
 export default {
   name: 'Home',
   data: () => {
     return {
-      isMaching: true,
+      isActiveMatching: false,
+      isLoadActiveMatching: false,
     }
-  }
+  },
+  computed: {
+    isMatchingOnStyle: function () {
+      return this.isActiveMatching && !this.isLoadActiveMatching
+    },
+    isMatchingOffStyle: function () {
+      return !this.isActiveMatching && !this.isLoadActiveMatching
+    }
+  },
+  methods: {
+    activeMatching: function () {
+
+      this.isLoadActiveMatching = true
+
+      this.$http.put('/user/active-matching')
+      .then((response) => {
+        this.isActiveMatching = response.data.isActiveMatching
+        if (this.isActiveMatching) {
+          alert("매칭이 활성화 되었습니다.")
+        } else {
+          alert("매칭이 비활성화 되었습니다.")
+        }
+      })
+      .catch((error) => {
+        alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.isLoadActiveMatching = false
+      })
+    },
+  },
+  created () {
+    if (VueCookies.get('isActiveMatching') === 'true') this.isActiveMatching = true
+    else this.isActiveMatching = false
+  },
 }
 </script>
 
@@ -111,8 +154,16 @@ a:first-of-type .basic-button-design {
   font-size: 16px;
   padding: 0 10px;
   border-radius: 3px;
-  background-color: #dadada;
+  background-color: #ffffff;
   color: #000000;
+}
+.macthing-on-status-style {
+  background-color: #32ff5f;
+  color: #000000;
+}
+.macthing-off-status-style {
+  background-color: #ff3232;
+  color: #ffffff;
 }
 .macthing-active-button {
   color: #ffffff;

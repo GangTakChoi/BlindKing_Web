@@ -17,7 +17,7 @@
         <tr>
           <td scope="row">{{ this.nickname }}</td>
           <td>{{ this.age }}</td>
-          <td>{{ this.mbti === "" ? "?" : this.mbti }}</td>
+          <td>{{ this.mbti === "unkown" ? "?" : this.mbti }}</td>
         </tr>
       </tbody>
     </table>
