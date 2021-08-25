@@ -18,11 +18,9 @@
       
       <div class="line-wrap">
         <label class="custom-label" for="inlineFormCustomSelectPref">MBTI</label>
-        <select class="custom-select" id="inlineFormCustomSelectPref">
-          <option selected>무관</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+        <select class="custom-select" id="inlineFormCustomSelectPref" v-model="searchMbtiValue">
+          <option selected :value="null">무관</option>
+          <option v-for="(mbti, index) in mbtiList" :key="index" :value="mbti">{{ mbti }}</option>
         </select>
       </div>
       <div class="line-wrap">
@@ -41,21 +39,24 @@
           <option value="3">Three</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-info btn-block search-button">검색</button>
+      <button type="submit" class="btn btn-info btn-block search-button" @click="search">검색</button>
     </div>
     <div class="card-container">
       <div class="partner-card" v-for="(partnerInfo, key) in matchingPartnerList" :key="key">
+        <div class="nickname-section">
+          {{ partnerInfo.nickname }}
+        </div>
         <table class="table table-bordered">
           <thead class="thead-dark">
             <tr>
-              <th scope="col">닉네임</th>
+              <th scope="col">지역</th>
               <th scope="col">나이</th>
               <th scope="col">MBTI</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td scope="row">{{ partnerInfo.nickname }}</td>
+              <td scope="row">{{ partnerInfo.region.rootAreaName + ' ' + partnerInfo.region.subAreaName }}</td>
               <td>{{ partnerInfo.birthYear === 0 ? "?" : getAge(partnerInfo.birthYear) }}</td>
               <td>{{ partnerInfo.mbti === "unkown" ? "?" : partnerInfo.mbti }}</td>
             </tr>
@@ -83,7 +84,9 @@ export default {
     return {
       isShowRegionSelectBox: false,
       isResponseComplete: false,
+      mbtiList: [],
       matchingPartnerList: [],
+      searchMbtiValue: null,
       getAge: (birthYear) => {
         var now = new Date();	// 현재 날짜 및 시간
         return now.getFullYear() - birthYear + 1;
@@ -91,6 +94,16 @@ export default {
       getDetailLink: (userId) => {
         return "/matching/detail/" + userId
       }
+    }
+  },
+  methods: {
+    search: async function () {
+      let searchStringQuery = ''
+
+      searchStringQuery += 'mbti=' + this.searchMbtiValue + '&'
+
+      let response = await this.$http.get('/user/maching-partners?' + searchStringQuery)
+      this.matchingPartnerList = response.data.userList
     }
   },
   async created () {
@@ -105,7 +118,8 @@ export default {
       this.isResponseComplete = true
     } else {
       let response = await this.$http.get('/user/maching-partners')
-      this.matchingPartnerList = response.data
+      this.matchingPartnerList = response.data.userList
+      this.mbtiList = response.data.mbtiList
     }
     
     this.isResponseComplete = true
@@ -118,6 +132,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.nickname-section {
+  width: 100%;
+  text-align: center;
+  padding: 0px 10px 10px 10px;
+}
 .search-button {
   margin-top: 15px;
   font-size: 18px;
@@ -165,7 +184,7 @@ export default {
   margin-top: 15px;
 }
 .detail-btn-blank {
-  height: 60px;
+  height: 45px;
 }
 .card-container {
   display: flex;
@@ -185,7 +204,7 @@ export default {
 }
 .table {
   text-align: center;
-  margin-bottom: 21px;
+  margin-bottom: 18px;
 }
 .question-section {
   font-weight: bold;
@@ -209,6 +228,9 @@ export default {
 @media (max-width: 768px) {
   .age-select {
     width: 30%;
+  }
+  .nickname-section {
+    font-size: 16px;
   }
 }
 </style>
