@@ -8,7 +8,17 @@ import commonMixin from '@/mixin/commonMixin'
 Vue.prototype.$G = Vue.observable({
   isLogin: false
 });
-Vue.prototype.$http = axios
+
+// http request config
+Vue.prototype.$http = axios.create({
+  baseURL: 'http://localhost:3000/',
+  timeout: 5000,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  }
+});
+
 Vue.config.productionTip = false
 Vue.mixin(commonMixin)
 

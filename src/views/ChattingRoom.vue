@@ -70,7 +70,7 @@ export default {
     }
   },
   created () {
-    this.socket = io('/chatting')
+    this.socket = io('/chatting').connect('http://localhost:3000')
 
     this.socket.on("connectSuccess", () => {
       let data = {
