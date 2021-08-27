@@ -4,11 +4,20 @@ import router from './router'
 import axios from 'axios'
 import store from './store'
 import commonMixin from '@/mixin/commonMixin'
+import globalConfig from '../config/global.config'
 
-Vue.prototype.$G = Vue.observable({
-  isLogin: false
+Vue.prototype.$G = Vue.observable(globalConfig);
+
+// http request config
+Vue.prototype.$http = axios.create({
+  baseURL: globalConfig.baseApiUrl,
+  timeout: 10000,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  }
 });
-Vue.prototype.$http = axios
+
 Vue.config.productionTip = false
 Vue.mixin(commonMixin)
 

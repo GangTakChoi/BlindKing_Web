@@ -2,7 +2,7 @@
   <div class="content-container">
     <div  v-if="this.$G.isLogin">
       <router-link to="/">
-        <button v-if="isActiveMatching" class="top-show-button basic-button-design shadow-sm rounded" @click="useTopDisplay">
+        <button v-if="isActiveMatching" :class="{ 'disabled' : isBlockUseTopMatchingDisplay }" class="top-show-button basic-button-design shadow-sm rounded" @click="useTopDisplay">
           매칭 상위 노출
           <br>
           <span v-if="isBlockUseTopMatchingDisplay" style="font-size:16px; font-weight:normal; color: red;">
@@ -180,6 +180,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 .lead {
   margin-top: 50px;
 }
@@ -242,9 +246,9 @@ a:first-of-type .basic-button-design {
 }
 
 .blinking {
-  -webkit-animation:blink 1.3s ease-in-out infinite alternate;
-  -moz-animation:blink 1.3s ease-in-out infinite alternate;
-  animation:blink 1.3s ease-in-out infinite alternate;
+  -webkit-animation:blink 1.0s ease-in-out infinite alternate;
+  -moz-animation:blink 1.0s ease-in-out infinite alternate;
+  animation:blink 1.0s ease-in-out infinite alternate;
 } 
 @-webkit-keyframes blink {
   0% {opacity:0.3;}

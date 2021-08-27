@@ -52,7 +52,8 @@ export default {
   },
   methods: {
     chattingAlimSocketConnect: function () {
-      this.socket = io('/chatting-alim')
+      console.log(this.$G.baseApiUrl)
+      this.socket = io(this.$G.baseApiUrl + '/chatting-alim')
 
       const TOKEN = VueCookies.get('token');
 

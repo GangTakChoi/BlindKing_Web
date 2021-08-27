@@ -70,7 +70,7 @@ export default {
     }
   },
   created () {
-    this.socket = io('/chatting')
+    this.socket = io(this.$G.baseApiUrl + '/chatting')
 
     this.socket.on("connectSuccess", () => {
       let data = {

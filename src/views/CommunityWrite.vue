@@ -19,6 +19,7 @@
 <script>
 import ClassicEditor from '@/assets/js/ckeditor';
 import CKEditor from '@ckeditor/ckeditor5-vue2';
+import GlobalConfig from '/config/global.config'
 
 export default {
   name: "CommunityWrite",
@@ -59,7 +60,7 @@ export default {
         },
         simpleUpload: {
             // The URL that the images are uploaded to.
-            uploadUrl: 'community/image-upload',
+            uploadUrl: GlobalConfig.baseApiUrl + '/community/image-upload',
 
             // Enable the XMLHttpRequest.withCredentials property.
             withCredentials: true,
