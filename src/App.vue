@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     chattingAlimSocketConnect: function () {
-      this.socket = io('/chatting-alim').connect('http://localhost:3000')
+      this.socket = io('/chatting-alim')
 
       const TOKEN = VueCookies.get('token');
 
