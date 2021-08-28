@@ -1,9 +1,4 @@
 let commonMixin = {
-  data () {
-    return {
-      isMobile: Boolean
-    }
-  },
   methods: {
     fillZero: function (num) {
       if (num < 10) {
@@ -40,9 +35,6 @@ let commonMixin = {
       return returnData
     }
   },
-  created () {
-    this.isMobile = window.innerWidth <= 768
-  }
 }
 
 export default commonMixin

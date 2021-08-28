@@ -52,7 +52,7 @@ export default {
       this.$http.post('/user/login', reqBody).then((response) => {
         if (response.status === 201) {
           alert('로그인 성공')
-          this.$G.isLogin = true
+          this.$global.isLogin = true
           this.$emit('loginSuccess')
           $('#close').trigger('click')
           location.reload()

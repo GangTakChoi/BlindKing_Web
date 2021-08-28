@@ -4,13 +4,16 @@ import router from './router'
 import axios from 'axios'
 import store from './store'
 import commonMixin from '@/mixin/commonMixin'
-import globalConfig from '../config/global.config'
 
-Vue.prototype.$G = Vue.observable(globalConfig);
+// 전역 변수 등록
+Vue.prototype.$global = Vue.observable({
+  isLogin: false,
+  isMobile: Boolean
+})
 
 // http request config
 Vue.prototype.$http = axios.create({
-  baseURL: globalConfig.baseApiUrl,
+  baseURL: process.env.VUE_APP_BASE_API_HOST,
   timeout: 10000,
   withCredentials: true,
   headers: {

@@ -203,7 +203,8 @@ export default {
 
 <style lang="scss" scoped>
 .content-container {
-  // width: 90%;
+  width: 90%;
+  max-width: 1300px;
 }
 .input-group {
   background-color: #fff;

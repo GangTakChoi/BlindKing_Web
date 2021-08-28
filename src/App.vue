@@ -7,7 +7,7 @@
         </router-link>
       </div>
       <div class="login-wrap">
-        <div v-if="!$G.isLogin">
+        <div v-if="!$global.isLogin">
           <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModal">
             로그인
           </button>
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="main-container">
-      <div v-if="!isMobile && !isHome" class="go-back" @click="goBack">
+      <div v-if="!$global.isMobile && !isHome" class="go-back" @click="goBack">
       </div>
       <router-view/>
     </div>
@@ -52,8 +52,7 @@ export default {
   },
   methods: {
     chattingAlimSocketConnect: function () {
-      console.log(this.$G.baseApiUrl)
-      this.socket = io(this.$G.baseApiUrl + '/chatting-alim')
+      this.socket = io(process.env.VUE_APP_BASE_API_HOST + '/chatting-alim')
 
       const TOKEN = VueCookies.get('token');
 
@@ -95,10 +94,13 @@ export default {
   async created () {
     this.refreshIsHome()
 
+    this.$global.isMobile = window.innerWidth <= 768
+
     // 로그인 확인 요청
     this.$http.get('/verify-token').then((response) => {
         if (response.status !== 200) return
-        this.$G.isLogin = true
+
+        this.$global.isLogin = true
         this.chattingAlimSocketConnect()
       }).catch((error) => {
         console.log(error)
@@ -123,16 +125,13 @@ export default {
 @import "./assets/css/ckeditor5.css";
 
 body {
-  // background: #efefef;
-  // background: #e2e2e2;
   background: #eeeef1;
-  // background: #f0f0f0;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 @media (max-width: 768px) {
   body {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 

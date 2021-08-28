@@ -1,21 +1,5 @@
 /*! 공통 스타일 선언 */
 
-/*
- body {
-  font-family: 'Nanum Gothic' ,serif !important;
-}
-
-.title {
-  font-family: 'Nanum Myeongjo', serif;
-}
-
-.contents {
-  font-family: 'Nanum Gothic', sans-serif;
-} */
-a:hover {
-  text-decoration: none !important;
-}
-
 .main-container {
   position: relative;
   width: 100%;
@@ -34,3 +18,10 @@ a:hover {
     width: 95%;
   }
 }
+
+a:hover {
+  text-decoration: none !important;
+}
+
+
+

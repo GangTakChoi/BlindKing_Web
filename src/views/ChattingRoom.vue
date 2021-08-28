@@ -12,15 +12,15 @@
         </div>
       </div>
       <div class="input-section">
-        <small id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
-        <textarea :disabled="isClose" v-if="!isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
+        <small v-if="!$global.isMobile" id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
+        <textarea :disabled="isClose" v-if="!$global.isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
         <textarea :disabled="isClose" v-else v-model="message" class="form-control" rows="3"></textarea>
         <button :disabled="isClose" class="btn btn-primary" @click="sendMessage">전송</button>
       </div>
     </div>
 
     <!-- 모바일에서만 표시되는 뒤로가기 버튼 -->
-    <div v-if="isMobile" class="back-button" @click="goBack">
+    <div v-if="$global.isMobile" class="back-button" @click="goBack">
       <svg fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
         <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
       </svg>
@@ -70,7 +70,7 @@ export default {
     }
   },
   created () {
-    this.socket = io(this.$G.baseApiUrl + '/chatting')
+    this.socket = io(process.env.VUE_APP_BASE_API_HOST + '/chatting')
 
     this.socket.on("connectSuccess", () => {
       let data = {
@@ -202,6 +202,7 @@ export default {
 }
 .text-muted {
   position:absolute;
+  font-size: 14px;
   top: -9px;
 }
 .text-muted::before {

@@ -32,15 +32,16 @@
             <span class="dislike">{{ dislike }}</span>
           </div>
         </div>
+        <div v-if="isResponseComplete" class="comment-input-section">
+          <textarea class="form-control comment-textarea" row="3" v-model="registCommentInput" @keyup="autoHeightTextarea"></textarea>
+          <button class="btn btn-primary comment-regist-button" @click="registComment" :disabled="!isCommentRegistButtonActivity">등록</button>
+        </div>
       </div>
     </div>
 
     
 
-    <div v-if="isResponseComplete" class="comment-input-section shadow">
-      <textarea class="form-control comment-textarea" row="3" v-model="registCommentInput" @keyup="autoHeightTextarea"></textarea>
-      <button class="btn btn-primary comment-regist-button" @click="registComment" :disabled="!isCommentRegistButtonActivity">등록</button>
-    </div>
+    
 
     <div v-if="isResponseComplete" class="comment-section shadow">
       <div v-if="isCommentRegistLoading" class="d-flex justify-content-center m-3">
@@ -288,7 +289,6 @@ export default {
   border-radius: 5px;
   width: 100%;
   margin-top: 30px;
-  padding: 10px;
 }
 .comment-textarea {
   -ms-overflow-style: none; /* IE and Edge */
@@ -311,6 +311,7 @@ hr {
   width: 100%;
   // font-weight: bold;
   font-size: 1.8rem;
+  text-align: center;
   // margin-bottom: 20px;
 }
 .board-view-wrap {
@@ -368,6 +369,15 @@ hr {
 @media (max-width: 768px) {
   .title {
     font-size: 1.4rem;
+  }
+  .content-container {
+    margin-top: 10px;
+  }
+  .board-view-wrap {
+    padding: 12px;
+  }
+  .comment-section {
+    margin-top: 10px;
   }
 }
 </style>

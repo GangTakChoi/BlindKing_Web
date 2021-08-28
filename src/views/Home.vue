@@ -1,6 +1,6 @@
 <template>
   <div class="content-container">
-    <div  v-if="this.$G.isLogin">
+    <div  v-if="this.$global.isLogin">
       <router-link to="/">
         <button v-if="isActiveMatching" :class="{ 'disabled' : isBlockUseTopMatchingDisplay }" class="top-show-button basic-button-design shadow-sm rounded" @click="useTopDisplay">
           매칭 상위 노출
