@@ -21,14 +21,14 @@
           
         </div>
         <div class="hand-thumbs-wrap">
-          <div class="hand-thumbs-up-wrap">
-            <img v-if="isHandUp" class="hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg" @click="evaluateBoard(true)">
-            <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-up.svg" @click="evaluateBoard(true)">
+          <div class="hand-thumbs-up-wrap" @click="evaluateBoard(true)">
+            <img v-if="isHandUp" class="hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
+            <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-up.svg">
             <span class="like">{{ like }}</span>
           </div>
-          <div class="hand-thumbs-down-wrap">
-            <img v-if="isHandDown" class="hand-thumbs" src="@/assets/img/hand-thumbs-down-fill.svg" @click="evaluateBoard(false)">
-            <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-down.svg" @click="evaluateBoard(false)">
+          <div class="hand-thumbs-down-wrap" @click="evaluateBoard(false)">
+            <img v-if="isHandDown" class="hand-thumbs" src="@/assets/img/hand-thumbs-down-fill.svg">
+            <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-down.svg">
             <span class="dislike">{{ dislike }}</span>
           </div>
         </div>
@@ -342,18 +342,19 @@ hr {
   margin-top: 40px;
   padding: 40px 0 20px 0;
   text-align: center;
-  font-size: 16px;
+  font-size: 21px;
 }
 
 .hand-thumbs {
   cursor: pointer;
-  width: 17px;
+  width: 28px;
   margin-right: 15px;
   vertical-align: middle;
 }
 
 .hand-thumbs-up-wrap, .hand-thumbs-down-wrap {
   display: inline-block;
+  cursor: pointer;
 }
 
 .hand-thumbs-up-wrap {

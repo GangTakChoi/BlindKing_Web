@@ -8,35 +8,64 @@
     <div class="search-wrap shadow-sm" v-if="isResponseComplete">
       <div class="line-wrap">
         <label class="custom-label" for="inlineFormCustomSelectPref">지역</label>
-        <select class="custom-select" id="inlineFormCustomSelectPref">
-          <option selected>무관</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+        <select class="custom-select" id="inlineFormCustomSelectPref" v-model="searchInfo.selectUpperAreaInfo" @change="upperAreaSelect">
+          <option selected :value="null">무관</option>
+          <option v-for="(areaInfo, index) in upperAreaList" :key="index" :value="areaInfo">{{areaInfo.name}}</option>
         </select>
+      </div>
+      <div v-if="searchInfo.selectUpperAreaInfo !== null" class="subarea-checkbox-wrap shadow-sm">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" 
+          :id="searchInfo.selectUpperAreaInfo.code"
+          :value="searchInfo.selectUpperAreaInfo"
+          v-model="searchInfo.upperAreaCheckedList"
+          @change="upperAreaCheck($event, searchInfo.selectUpperAreaInfo)">
+          <label class="custom-control-label" :for="searchInfo.selectUpperAreaInfo.code">{{ searchInfo.selectUpperAreaInfo.name }} 전체</label>
+        </div>
+        <div class="custom-control custom-checkbox"
+        v-for="(areaInfo) in subAreaInfo[searchInfo.selectUpperAreaInfo.code]"
+        :key="areaInfo.code">
+          <input type="checkbox" class="custom-control-input" 
+          :id="areaInfo.code" 
+          :value="areaInfo"
+          :disabled="searchInfo.upperAreaCheckedList.includes(searchInfo.selectUpperAreaInfo)"
+          v-model="searchInfo.subAreaCheckedList">
+          <label class="custom-control-label" :for="areaInfo.code">{{areaInfo.name.substr(5)}}</label>
+        </div>
+      </div>
+
+      <div v-if="areaFilterList.length !== 0" class="filter-wrap shadow-sm">
+        <span v-for="(areaInfo) in areaFilterList" :key="areaInfo.code" class="filter-child-wrap">
+          {{ areaInfo.name }}
+          <button class="filter-delete-button" @click="deleteAreaFilter(areaInfo)"></button>
+        </span>
       </div>
       
       <div class="line-wrap">
         <label class="custom-label" for="inlineFormCustomSelectPref">MBTI</label>
-        <select class="custom-select" id="inlineFormCustomSelectPref" v-model="searchMbtiValue">
+        <select class="custom-select" id="inlineFormCustomSelectPref" @change="selectMBTI($event)" v-model="searchInfo.selectMbti">
           <option selected :value="null">무관</option>
           <option v-for="(mbti, index) in mbtiList" :key="index" :value="mbti">{{ mbti }}</option>
         </select>
       </div>
+
+      <div v-if="searchInfo.mbtiCheckedList.length !== 0" class="line-wrap filter-wrap shadow-sm">
+        <span v-for="(mbti, index) in searchInfo.mbtiCheckedList" :key="index" class="filter-child-wrap">
+          {{ mbti }}
+          <button class="filter-delete-button" @click="deleteMbtiFilter(mbti)"></button>
+        </span>
+      </div>
+
       <div class="line-wrap">
         <label class="custom-label" for="inlineFormCustomSelectPref">나이</label>
-        <select class="custom-select age-select" id="inlineFormCustomSelectPref">
-          <option selected>무관</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+        <select class="custom-select age-select" id="inlineFormCustomSelectPref" v-model="searchInfo.ageRangeInfo.min">
+          <option selected :value="null">무관</option>
+          <option v-for="(age, index) in ageMinRangeArray" :value="age" :key="index">{{ age }}</option>
         </select>
         ~
-        <select class="custom-select age-select" id="inlineFormCustomSelectPref">
-          <option selected>무관</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
+        <select class="custom-select age-select" id="inlineFormCustomSelectPref" v-model="searchInfo.ageRangeInfo.max">
+          <option selected :value="null">무관</option>
+          <option v-for="(age, index) in ageMaxRangeArray" :value="age" :key="index">{{ age }}</option>
         </select>
       </div>
       <button type="submit" class="btn btn-info btn-block search-button" @click="search">검색</button>
@@ -85,22 +114,119 @@ export default {
       isShowRegionSelectBox: false,
       isResponseComplete: false,
       mbtiList: [],
+      upperAreaList: [],
+      subAreaInfo: {
+        // '상위지역코드': ['하위지역코드','하위지역코드', .....],
+        // '상위지역코드': ['하위지역코드','하위지역코드', .....],
+        // ..
+      },
+
       matchingPartnerList: [],
-      searchMbtiValue: null,
+      searchInfo: {
+        mbtiCheckedList: [],
+        ageRangeInfo: {
+          min: null,
+          max: null
+        },
+        selectUpperAreaInfo: null,
+        selectMbti: null,
+        upperAreaCheckedList: [],
+        subAreaCheckedList: []
+      },
       getAge: (birthYear) => {
         var now = new Date();	// 현재 날짜 및 시간
         return now.getFullYear() - birthYear + 1;
+      },
+      getBirthYear: (age) => {
+        if (!age) return null
+
+        var now = new Date();
+        return now.getFullYear() - age + 1
       },
       getDetailLink: (userId) => {
         return "/matching/detail/" + userId
       }
     }
   },
-  methods: {
-    search: async function () {
-      let searchStringQuery = ''
+  computed: {
+    areaFilterCount: function () {
+      return this.searchInfo.upperAreaCheckedList.length + this.searchInfo.subAreaCheckedList.length
+    },
+    areaFilterList: function () {
+      return this.searchInfo.upperAreaCheckedList.concat(this.searchInfo.subAreaCheckedList)
+    },
+    ageMinRangeArray: function () {
+      let ageRangeArray = []
+      let maxAge = this.searchInfo.ageRangeInfo.max === null ? 100 : this.searchInfo.ageRangeInfo.max
 
-      searchStringQuery += 'mbti=' + this.searchMbtiValue + '&'
+      for (var i=20; i<=maxAge; i++) {
+        ageRangeArray.push(i)
+      }
+      return ageRangeArray
+    },
+    ageMaxRangeArray: function () {
+      let ageRangeArray = []
+      let minAge = this.searchInfo.ageRangeInfo.min === null ? 20 : this.searchInfo.ageRangeInfo.min
+
+      for (var i=minAge; i<=100; i++) {
+        ageRangeArray.push(i)
+      }
+      return ageRangeArray
+    }
+  },
+  methods: {
+    selectMBTI: function (e) {
+      if (e.target.value === '') {
+        this.searchInfo.mbtiCheckedList = []
+      } else {
+        if (!this.searchInfo.mbtiCheckedList.includes(e.target.value)) this.searchInfo.mbtiCheckedList.push(e.target.value)
+      }
+    },
+    deleteMbtiFilter: function (filterMbti) {
+      this.searchInfo.mbtiCheckedList = this.searchInfo.mbtiCheckedList.filter((mbti) => mbti !== filterMbti)
+
+      if (this.searchInfo.mbtiCheckedList.length === 0) this.searchInfo.selectMbti = null
+    },
+    deleteAreaFilter: function (filterAreaInfo) {
+      if (filterAreaInfo.parentCode === null) {
+        this.searchInfo.upperAreaCheckedList = this.searchInfo.upperAreaCheckedList.filter((areaInfo) => areaInfo !== filterAreaInfo)
+      } else {
+        this.searchInfo.subAreaCheckedList = this.searchInfo.subAreaCheckedList.filter((areaInfo) => areaInfo !== filterAreaInfo)
+      }
+    },
+    upperAreaSelect: function () {
+      // 무관 선택 시 지역 관련 검색 조건 초기화
+      if (this.searchInfo.selectUpperAreaInfo === null) {
+        this.searchInfo.upperAreaCheckedList = []
+        this.searchInfo.subAreaCheckedList = []
+      }
+    },
+    upperAreaCheck: function (e, selectedUpperAreaInfo) {
+      if (e.target.checked) {
+        this.searchInfo.subAreaCheckedList = this.searchInfo.subAreaCheckedList.filter(
+          (subAreaInfo) => subAreaInfo.parentCode !== selectedUpperAreaInfo.code
+        )
+      }
+    },
+    search: async function () {
+      let checkedUpperAreaCodeList = []
+      let checkedSubAreaCodeList = []
+
+      this.searchInfo.upperAreaCheckedList.forEach((areaInfo) => {
+        checkedUpperAreaCodeList.push(areaInfo.code)
+      })
+
+      this.searchInfo.subAreaCheckedList.forEach((areaInfo) => {
+        checkedSubAreaCodeList.push(areaInfo.code)
+      })
+
+      let searchStringQuery = 'isSearch=true&'
+
+      searchStringQuery += 'mbtiList=' + this.searchInfo.mbtiCheckedList.join(',') + '&'
+      searchStringQuery += 'ageMin=' + this.getBirthYear(this.searchInfo.ageRangeInfo.min) + '&'
+      searchStringQuery += 'ageMax=' + this.getBirthYear(this.searchInfo.ageRangeInfo.max) + '&'
+      searchStringQuery += 'upperAreaCodeList=' + checkedUpperAreaCodeList.join(',') + '&'
+      searchStringQuery += 'subAreaCodeList=' + checkedSubAreaCodeList.join(',') + '&'
 
       let response = await this.$http.get('/user/maching-partners?' + searchStringQuery)
       this.matchingPartnerList = response.data.userList
@@ -120,6 +246,29 @@ export default {
       let response = await this.$http.get('/user/maching-partners')
       this.matchingPartnerList = response.data.userList
       this.mbtiList = response.data.mbtiList
+      let regionInfo = response.data.regionInfo
+      this.upperAreaList = regionInfo.upperArea
+
+      regionInfo.subArea.forEach((areaInfo) => {
+        let isSubArea = Object.keys(this.subAreaInfo).includes(areaInfo.parentCode)
+        let upperAreaName
+        
+        for (let index in regionInfo.upperArea) {
+          let upperAreaInfo = regionInfo.upperArea[index]
+
+          if (upperAreaInfo.code === areaInfo.parentCode) {
+            upperAreaName = upperAreaInfo.name
+            break
+          }
+        }
+
+        if (!isSubArea) this.subAreaInfo[areaInfo.parentCode] = []
+
+        // 상위 지역 이름 표시 (ex. 서울 > 관악구)
+        areaInfo.name = upperAreaName + ' > ' + areaInfo.name
+
+        this.subAreaInfo[areaInfo.parentCode].push(areaInfo)
+      })
     }
     
     this.isResponseComplete = true
@@ -132,17 +281,66 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.content-container {
+  font-size: 17px;
+}
 .nickname-section {
   width: 100%;
   text-align: center;
   padding: 0px 10px 10px 10px;
 }
 .search-button {
-  margin-top: 15px;
+  margin-top: 24px;
   font-size: 18px;
 }
 .line-wrap:not(:first-child) {
   margin-top: 15px;
+}
+.filter-wrap {
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #e1e1e1;
+  border: 1px solid #bbbbbb;
+  margin: 0 auto;
+}
+.filter-child-wrap {
+  margin-right: 8px;
+}
+.filter-delete-button {
+  width: 21px;
+  height: 21px;
+  border: 0;
+  vertical-align: text-top;
+  background: url("../assets/img/x.svg");
+  background-size: 23px;
+  background-repeat: no-repeat;
+}
+.subarea-checkbox-wrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border-radius: 10px;
+  font-size: 16px;
+  padding: 10px 20px 5px 20px;
+  background-color: #f4f4f4;
+  margin: 20px auto;
+  border: 1px solid #dbdbdb;
+  .custom-checkbox {
+    width: 20%;
+    margin-bottom: 5px;
+  }
+@media (min-width: 1400px) {
+  .custom-checkbox {
+    width: 16.6%;
+    margin-bottom: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .custom-checkbox {
+    width: 50%;
+    margin-bottom: 10px;
+  }
+}
 }
 .custom-label {
   display: inline-block;
@@ -171,10 +369,16 @@ export default {
 .search-wrap {
   background-color: #fff;
   border-radius: 6px;
-  padding: 18px 12px 14px 12px;
+  padding: 24px 24px 20px 24px;
+  // padding: 18px 12px 14px 12px;
   width: 100%;
   margin-bottom: 20px;
   border: 1px solid #bdbdbd;
+}
+@media (max-width: 768px) {
+  .search-wrap {
+    padding: 15px;
+  }
 }
 .detail-btn {
   position: absolute;

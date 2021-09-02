@@ -5,9 +5,13 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compiles and hot-reloads [개발환경]
 ```
-npm run serve
+npm run dev
+```
+### Compiles and hot-reloads [상용환경]
+```
+npm run prod
 ```
 
 ### Compiles and minifies for production

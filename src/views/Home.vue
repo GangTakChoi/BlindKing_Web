@@ -2,7 +2,7 @@
   <div class="content-container">
     <div  v-if="this.$global.isLogin">
       <router-link to="/">
-        <button v-if="isActiveMatching" :class="{ 'disabled' : isBlockUseTopMatchingDisplay }" class="top-show-button basic-button-design shadow-sm rounded" @click="useTopDisplay">
+        <button v-if="isActiveMatching" class="top-show-button basic-button-design shadow-sm rounded" @click="useTopDisplay">
           매칭 상위 노출
           <br>
           <span v-if="isBlockUseTopMatchingDisplay" style="font-size:16px; font-weight:normal; color: red;">
@@ -40,26 +40,6 @@
       <router-link to="/community">
         <button class="friends-button basic-button-design shadow-sm rounded">
           커뮤니티
-        </button>
-      </router-link>
-      <router-link to="/suggest">
-        <button class="suggest-button basic-button-design shadow-sm rounded">
-          내정보관리
-        </button>
-      </router-link>
-      <router-link to="/suggest">
-        <button class="suggest-button basic-button-design shadow-sm rounded">
-          문의하기
-        </button>
-      </router-link>
-      <router-link to="/donation">
-        <button class="donation-button basic-button-design shadow-sm rounded">
-          후원하기
-        </button>
-      </router-link>
-      <router-link to="/test">
-        <button class="donation-button basic-button-design shadow-sm rounded">
-          test
         </button>
       </router-link>
     </div>
