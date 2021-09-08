@@ -58,7 +58,7 @@ export default {
           location.reload()
         }
       }).catch((error) => {
-        alert('로그인 실패')
+        alert(error.response.data.errorMessage)
         console.log(error);
       })
     },

@@ -42,18 +42,25 @@
           커뮤니티
         </button>
       </router-link>
+      <!-- <router-link to="www.naver.com" target="_blank"> -->
+      <a href="https://toon.at/donate/637662824189086998" target="_blank">
+        <button class="friends-button basic-button-design shadow-sm rounded">
+          후원하기
+        </button>
+      </a>
+      <!-- </router-link> -->
     </div>
     <div v-else>
       <div class="jumbotron jumbotron-fluid rounded">
         <div class="container">
-          <h1 class="display-4">안녕하세요, 순수함과 설레임입니다.</h1>
-          <p class="lead">
-            현재 저희 서비스는 일반 소개팅 서비스에서 사진을 제외하고 오직 마음을 보는 것에 중점을 두어 제작하였습니다. <br>
-            서비스 이용은 전부 무료이며 로그인을 통해 이용하실 수 있습니다. <br><br>
-            저는 이 싸이트를 통해 남녀간의 건전한 소통과 만남이 많아 졌으면 하는 마음으로 만들었습니다. <br>
-            편하게 이용해보시고 부족한 부분과 좋은 아이디어가 있다면 건의하기를 통해 건의해주시면 고려 후 개발진행하도록 하겠습니다. <br><br>
-            또한 궁금한 것이 있으시다면 문의하기를 통해 질문해주세요.
-          </p>
+          <h1 class="display-5">안녕하세요, 1인 개발자 비발디 입니다.</h1>
+          <pre class="lead">
+            개발자 취업을 위해 포트폴리오용으로 개발된 싸이트이며,
+            평소에 사진이 없는 소개팅이 있으면 좋겠다는 생각을 했고
+            포트폴리오를 만드는 겸 이 싸이트를 개발하게 되었습니다.
+            모든 서비스는 무료로 진행하지만 후원하기 기능과 제 월급을 통해 서버유지비를 충당할 계획이고
+            서버유지비가 감당하기 힘든 수준을 넘어가면 서비스를 중단할 예정입니다.
+          </pre>
         </div>
       </div>
     </div>
@@ -166,6 +173,8 @@ export default {
 }
 .lead {
   margin-top: 50px;
+  font-size: 1.3rem;
+  white-space: pre-line;
 }
 .jumbotron-fluid {
   padding-left: 20px;

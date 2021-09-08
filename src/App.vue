@@ -3,7 +3,7 @@
     <div id="nav" class="shadow-sm">
       <div class="logo-wrap">
         <router-link to="/">
-          <img alt="logo" src="./assets/img/new-logo2.png" class="logo_img">
+          <img alt="logo" src="./assets/img/BlindKing2.png" class="logo_img">
         </router-link>
       </div>
       <div class="login-wrap">
@@ -96,15 +96,21 @@ export default {
 
     this.$global.isMobile = window.innerWidth <= 768
 
-    // 로그인 확인 요청
-    this.$http.get('/verify-token').then((response) => {
-        if (response.status !== 200) return
+    const TOKEN = VueCookies.get('token');
 
-        this.$global.isLogin = true
-        this.chattingAlimSocketConnect()
-      }).catch((error) => {
+    if (TOKEN) {
+      try {
+        let response = await this.$http.get('/verify-token')
+        
+        if (response.status === 200) {
+          this.$global.isLogin = true
+          this.chattingAlimSocketConnect()
+        }
+      } catch (error) {
+        alert(error.response.data.errorMessage)
         console.log(error)
-      })
+      }
+    }
 
     // 뒤로가기 이벤트 발생시
     window.onpopstate = function(event) {
@@ -126,7 +132,7 @@ export default {
 
 body {
   background: #eeeef1;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 @media (max-width: 768px) {
@@ -137,8 +143,6 @@ body {
 
 #nav {
   background-color: #fff;
-  // box-shadow: 0px -3px 12px;
-  // box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
 
 .logo-wrap {
@@ -148,8 +152,8 @@ body {
 
 .logo_img {
   width: 180px;
-  margin-top: 17px;
-  margin-left: 15px;
+  margin-top: -11px;
+  margin-left: 2px;
 }
 
 .menu-list {
@@ -163,15 +167,6 @@ body {
 
 .login-button {
   font-size: 14px;
-}
-
-@media (max-width: 768px) {
-  // .go-back {
-  //   border: 0px solid #000;
-  //   background-color: #fff;
-  //   width: 100%;
-  //   height: 50px;
-  // }
 }
 
 @media (min-width: 768px) {
@@ -219,7 +214,7 @@ body {
 @media (max-width: 768px) {
   .logo_img {
     width: 188px;
-    margin-top: 16px;
+    margin-top: -13px;
   }
 }
 </style>

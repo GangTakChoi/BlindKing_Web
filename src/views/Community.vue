@@ -40,7 +40,7 @@
       <div class="input-group-prepend">
         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{searchOption}}</button>
         <div class="dropdown-menu">
-          <!-- <a class="dropdown-item" @click="selectSearchOption('닉네임')">닉네임</a> -->
+          <a class="dropdown-item" @click="selectSearchOption('닉네임')">닉네임</a>
           <a class="dropdown-item" @click="selectSearchOption('제목')">제목</a>
           <a class="dropdown-item" @click="selectSearchOption('내용')">내용</a>
           <a class="dropdown-item" @click="selectSearchOption('제목+내용')">제목+내용</a>

@@ -39,9 +39,6 @@
       </div>
     </div>
 
-    
-
-    
 
     <div v-if="isResponseComplete" class="comment-section shadow">
       <div v-if="isCommentRegistLoading" class="d-flex justify-content-center m-3">
