@@ -58,9 +58,9 @@ export default {
       questionList: [],
       getYears: () => {
         var now = new Date();	// 현재 날짜 및 시간
-        var year = now.getFullYear() - 18;	// 올해 성년 출생년도
+        var year = now.getFullYear() - 19;	// 올해 성년 출생년도
         let list = [];
-        for (let i = 1910; i < year; i += 1) list.push(i);
+        for (let i = 1910; i <= year; i += 1) list.push(i);
         return list
       },
     }

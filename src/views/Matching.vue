@@ -1,14 +1,9 @@
 <template>
   <div class="content-container">
-    <div class="d-flex justify-content-center" v-if="!isResponseComplete" style="margin-top: 100px">
-      <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
-        <span class="sr-only">Loading...</span>
-      </div>
-    </div>
-    <div class="search-wrap shadow-sm" v-if="isResponseComplete">
+    <div class="search-wrap shadow-sm">
       <div class="line-wrap">
         <label class="custom-label" for="inlineFormCustomSelectPref">지역</label>
-        <select class="custom-select" id="inlineFormCustomSelectPref" v-model="searchInfo.selectUpperAreaInfo" @change="upperAreaSelect">
+        <select class="custom-select" id="inlineFormCustomSelectPref" v-model="searchInfo.selectUpperAreaInfo" @change="upperAreaSelect" :disabled="upperAreaList.length === 0">
           <option selected :value="null">무관</option>
           <option v-for="(areaInfo, index) in upperAreaList" :key="index" :value="areaInfo">{{areaInfo.name}}</option>
         </select>
@@ -43,7 +38,7 @@
       
       <div class="line-wrap">
         <label class="custom-label" for="inlineFormCustomSelectPref">MBTI</label>
-        <select class="custom-select" id="inlineFormCustomSelectPref" @change="selectMBTI($event)" v-model="searchInfo.selectMbti">
+        <select class="custom-select" id="inlineFormCustomSelectPref" @change="selectMBTI($event)" v-model="searchInfo.selectMbti" :disabled="mbtiList.length === 0">
           <option selected :value="null">무관</option>
           <option v-for="(mbti, index) in mbtiList" :key="index" :value="mbti">{{ mbti }}</option>
         </select>
@@ -68,9 +63,12 @@
           <option v-for="(age, index) in ageMaxRangeArray" :value="age" :key="index">{{ age }}</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-info btn-block search-button" @click="search">검색</button>
+      <button type="submit" class="btn btn-info btn-block search-button" @click="search('search')">검색</button>
     </div>
-    <div class="card-container">
+
+
+    <!-- 인연 리스트 -->
+    <div class="card-container" v-if="isShowPartnerList">
       <div class="partner-card" v-for="(partnerInfo, key) in matchingPartnerList" :key="key">
         <div class="nickname-section">
           {{ partnerInfo.nickname }}
@@ -103,16 +101,25 @@
         </router-link>
       </div>
     </div>
+    <div class="d-flex justify-content-center" v-if="isShowLoading" style="margin-top: 100px">
+      <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div v-if="isShowMoreButton" @click="search('more')" class="more-partner-list-button shadow-sm"></div>
   </div>
 </template>
 
 <script>
+const PARTNER_LIST_COUNT = 30
+
 export default {
   name: 'Matching',
   data: () => {
     return {
-      isShowRegionSelectBox: false,
-      isResponseComplete: false,
+      isShowLoading: false,
+      isShowPartnerList: true,
+      isShowMoreButton: false,
       mbtiList: [],
       upperAreaList: [],
       subAreaInfo: {
@@ -120,7 +127,6 @@ export default {
         // '상위지역코드': ['하위지역코드','하위지역코드', .....],
         // ..
       },
-
       matchingPartnerList: [],
       searchInfo: {
         mbtiCheckedList: [],
@@ -131,7 +137,7 @@ export default {
         selectUpperAreaInfo: null,
         selectMbti: null,
         upperAreaCheckedList: [],
-        subAreaCheckedList: []
+        subAreaCheckedList: [],
       },
       getAge: (birthYear) => {
         var now = new Date();	// 현재 날짜 및 시간
@@ -208,70 +214,114 @@ export default {
         )
       }
     },
-    search: async function () {
-      let checkedUpperAreaCodeList = []
-      let checkedSubAreaCodeList = []
+    search: async function (type) {
+      try {
+        let isInitial = (type === 'initial') ? true : false
+        let isMore = (type === 'more') ? true : false
+        let skip = isMore ? this.matchingPartnerList.length : 0
+        this.isShowMoreButton = false
+        this.isShowPartnerList = isMore ? true : false
+        this.isShowLoading = true
 
-      this.searchInfo.upperAreaCheckedList.forEach((areaInfo) => {
-        checkedUpperAreaCodeList.push(areaInfo.code)
-      })
+        let checkedUpperAreaCodeList = []
+        let checkedSubAreaCodeList = []
 
-      this.searchInfo.subAreaCheckedList.forEach((areaInfo) => {
-        checkedSubAreaCodeList.push(areaInfo.code)
-      })
+        this.searchInfo.upperAreaCheckedList.forEach((areaInfo) => {
+          checkedUpperAreaCodeList.push(areaInfo.code)
+        })
 
-      let searchStringQuery = 'isSearch=true&'
+        this.searchInfo.subAreaCheckedList.forEach((areaInfo) => {
+          checkedSubAreaCodeList.push(areaInfo.code)
+        })
 
-      searchStringQuery += 'mbtiList=' + this.searchInfo.mbtiCheckedList.join(',') + '&'
-      searchStringQuery += 'ageMin=' + this.getBirthYear(this.searchInfo.ageRangeInfo.min) + '&'
-      searchStringQuery += 'ageMax=' + this.getBirthYear(this.searchInfo.ageRangeInfo.max) + '&'
-      searchStringQuery += 'upperAreaCodeList=' + checkedUpperAreaCodeList.join(',') + '&'
-      searchStringQuery += 'subAreaCodeList=' + checkedSubAreaCodeList.join(',') + '&'
+        let searchStringQuery = isInitial ? 'isInitial=true&' : 'isInitial=false&'
 
-      let response = await this.$http.get('/user/maching-partners?' + searchStringQuery)
-      this.matchingPartnerList = response.data.userList
+        if (this.searchInfo.mbtiCheckedList.length > 0) {
+          searchStringQuery += 'mbtiList=' + this.searchInfo.mbtiCheckedList.join(',') + '&'
+        }
+
+        if (this.searchInfo.ageRangeInfo.min !== null) {
+          searchStringQuery += 'ageMin=' + this.getBirthYear(this.searchInfo.ageRangeInfo.min) + '&'
+        }
+        
+        if (this.searchInfo.ageRangeInfo.max !== null) {
+          searchStringQuery += 'ageMax=' + this.getBirthYear(this.searchInfo.ageRangeInfo.max) + '&'
+        }
+        
+        if (checkedUpperAreaCodeList.length > 0) {
+          searchStringQuery += 'upperAreaCodeList=' + checkedUpperAreaCodeList.join(',') + '&'
+        }
+
+        if (checkedSubAreaCodeList.length > 0) {
+          searchStringQuery += 'subAreaCodeList=' + checkedSubAreaCodeList.join(',') + '&'
+        }
+
+        searchStringQuery += 'limit=' + PARTNER_LIST_COUNT + '&'
+        searchStringQuery += 'skip=' + skip + '&'
+
+        let response = await this.$http.get('/user/maching-partners?' + searchStringQuery)
+
+        if (isMore) {
+          this.matchingPartnerList = this.matchingPartnerList.concat(response.data.userList)
+        } else {
+          this.matchingPartnerList = response.data.userList
+        }
+        
+        if (isInitial) {
+          this.mbtiList = response.data.mbtiList
+          let regionInfo = response.data.regionInfo
+          this.upperAreaList = regionInfo.upperArea
+
+          // 지역 데이터 가공
+          regionInfo.subArea.forEach((areaInfo) => {
+            let isSubArea = Object.keys(this.subAreaInfo).includes(areaInfo.parentCode)
+            let upperAreaName
+            
+            for (let index in regionInfo.upperArea) {
+              let upperAreaInfo = regionInfo.upperArea[index]
+
+              if (upperAreaInfo.code === areaInfo.parentCode) {
+                upperAreaName = upperAreaInfo.name
+                break
+              }
+            }
+
+            if (!isSubArea) this.subAreaInfo[areaInfo.parentCode] = []
+
+            // 상위 지역 이름 표시 (ex. 서울 > 관악구)
+            areaInfo.name = upperAreaName + ' > ' + areaInfo.name
+
+            this.subAreaInfo[areaInfo.parentCode].push(areaInfo)
+          })
+        }
+
+        this.isShowMoreButton = (response.data.userList.length >= PARTNER_LIST_COUNT) ? true : false
+      } catch (error) {
+        alert('페이지 로드중 에러가 발생하였습니다.')
+      } finally {
+        this.isShowLoading = false
+        this.isShowPartnerList = true
+      }
     }
   },
   async created () {
-    let today = new Date()
-    let nowTimestamp = today.getTime()
-    let backTimestamp = Number(localStorage.getItem("뒤로가기발생시간"))
-    let savedData = localStorage.getItem(this.$route.name)
+    try {
+      let today = new Date()
+      let nowTimestamp = today.getTime()
+      let backTimestamp = Number(localStorage.getItem("뒤로가기발생시간"))
+      let savedData = localStorage.getItem(this.$route.name)
 
-    // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
-    if ( ( nowTimestamp - backTimestamp ) <= 100 && savedData !== null) {
-      Object.assign(this.$data, JSON.parse(savedData))
-      this.isResponseComplete = true
-    } else {
-      let response = await this.$http.get('/user/maching-partners')
-      this.matchingPartnerList = response.data.userList
-      this.mbtiList = response.data.mbtiList
-      let regionInfo = response.data.regionInfo
-      this.upperAreaList = regionInfo.upperArea
-
-      regionInfo.subArea.forEach((areaInfo) => {
-        let isSubArea = Object.keys(this.subAreaInfo).includes(areaInfo.parentCode)
-        let upperAreaName
-        
-        for (let index in regionInfo.upperArea) {
-          let upperAreaInfo = regionInfo.upperArea[index]
-
-          if (upperAreaInfo.code === areaInfo.parentCode) {
-            upperAreaName = upperAreaInfo.name
-            break
-          }
-        }
-
-        if (!isSubArea) this.subAreaInfo[areaInfo.parentCode] = []
-
-        // 상위 지역 이름 표시 (ex. 서울 > 관악구)
-        areaInfo.name = upperAreaName + ' > ' + areaInfo.name
-
-        this.subAreaInfo[areaInfo.parentCode].push(areaInfo)
-      })
+      // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
+      if ( ( nowTimestamp - backTimestamp ) <= 100 && savedData !== null) {
+        Object.assign(this.$data, JSON.parse(savedData))
+      } else {
+        await this.search('initial')
+      }
+    } catch (error) {
+      alert('페이지 로딩중 문제가 발생하였습니다.')
+      console.log(error)
     }
     
-    this.isResponseComplete = true
   },
   beforeRouteLeave (to, from, next) {
     localStorage.setItem(this.$route.name, JSON.stringify(this.$data));
@@ -329,18 +379,18 @@ export default {
     width: 20%;
     margin-bottom: 5px;
   }
-@media (min-width: 1400px) {
-  .custom-checkbox {
-    width: 16.6%;
-    margin-bottom: 10px;
+  @media (min-width: 1400px) {
+    .custom-checkbox {
+      width: 16.6%;
+      margin-bottom: 10px;
+    }
   }
-}
-@media (max-width: 768px) {
-  .custom-checkbox {
-    width: 50%;
-    margin-bottom: 10px;
+  @media (max-width: 768px) {
+    .custom-checkbox {
+      width: 50%;
+      margin-bottom: 10px;
+    }
   }
-}
 }
 .custom-label {
   display: inline-block;
@@ -420,6 +470,33 @@ export default {
   background-color:#f9f9f9;
   border: 1px solid #d8d6d6;
   padding: 10px;
+}
+
+.more-partner-list-button {
+  position: relative;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 15px;
+  height: 50px;
+  background-color: #ffffff;
+  border-radius: 6px;
+}
+
+.more-partner-list-button:hover {
+  opacity: 0.6;
+}
+
+.more-partner-list-button::after {
+  content: '';
+  width: 20px; /* 사이즈 */
+  height: 20px; /* 사이즈 */
+  border-top: 1px solid #121212; /* 선 두께 */
+  border-right: 1px solid #121212; /* 선 두께 */
+  display: inline-block;
+  position: absolute;
+  top: 50%; /* 기본 0px 값으로 해주세요 */
+  left: 50%; /* 기본 0px 값으로 해주세요 */
+  transform: translate(-50%, -75%) rotate(135deg);
 }
 
 @media (max-width: 1200px) {

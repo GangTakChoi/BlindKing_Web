@@ -132,7 +132,7 @@ export default {
 
 body {
   background: #eeeef1;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 @media (max-width: 768px) {

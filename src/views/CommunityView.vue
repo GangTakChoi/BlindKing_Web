@@ -336,8 +336,8 @@ hr {
 }
 
 .hand-thumbs-wrap {
-  margin-top: 40px;
-  padding: 40px 0 20px 0;
+  margin-top: 30px;
+  padding: 20px 0 20px 0;
   text-align: center;
   font-size: 21px;
 }
