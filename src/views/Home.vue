@@ -49,6 +49,11 @@
         </button>
       </a>
       <!-- </router-link> -->
+      <router-link to="/test">
+        <button class="friends-button basic-button-design shadow-sm rounded">
+          test
+        </button>
+      </router-link>
     </div>
     <div v-else>
       <div class="jumbotron jumbotron-fluid rounded">
@@ -108,10 +113,16 @@ export default {
       this.$http.put('/user/active-matching')
       .then((response) => {
         this.isActiveMatching = response.data.isActiveMatching
+
         if (this.isActiveMatching) {
           alert("매칭이 활성화 되었습니다.")
         } else {
           alert("매칭이 비활성화 되었습니다.")
+        }
+
+        if (response.data.isUseMatchingTopDisplay) {
+          this.isBlockUseTopMatchingDisplay = true
+          this.displayReUseWaitingTime()
         }
       })
       .catch((error) => {

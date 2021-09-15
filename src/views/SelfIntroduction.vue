@@ -7,21 +7,21 @@
     </div>
     <form @submit.prevent="saveSelfIntroduce" v-if="isResponseComplete">
       <div class="form-group">
-        <label for="exampleFormControlSelect1">출생년도</label>
+        <label for="exampleFormControlSelect1">출생년도 <span class="text-danger">(필수)</span></label>
         <select class="form-control" id="exampleFormControlSelect1" v-model="birthYear">
           <option v-for="year, key in getYears()" :key="key">{{ year }}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="exampleFormControlSelect1">MBTI <a href="https://www.16personalities.com/ko/%EB%AC%B4%EB%A3%8C-%EC%84%B1%EA%B2%A9-%EC%9C%A0%ED%98%95-%EA%B2%80%EC%82%AC" target="_blank">성격유형검사↗️</a></label>
+        <label for="exampleFormControlSelect1">MBTI <span class="text-danger">(필수)</span> <a href="https://www.16personalities.com/ko/%EB%AC%B4%EB%A3%8C-%EC%84%B1%EA%B2%A9-%EC%9C%A0%ED%98%95-%EA%B2%80%EC%82%AC" target="_blank">성격유형검사↗️</a></label>
         <select class="form-control" id="exampleFormControlSelect1" v-model="userMBTI">
           <option v-for="(mbtiInfo, index) in mbtiList" :key="index" :value="mbtiInfo">{{mbtiInfo === 'unkown' ? '모르겠어요' : mbtiInfo}}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="exampleFormControlSelect1">지역</label>
+        <label for="exampleFormControlSelect1">지역 <span class="text-danger">(필수)</span></label>
         <select class="form-control" id="areaSelect1" v-model="selectUpperAreaCode">
           <option v-for="(areaInfo, index) in upperArea" :key="index" :value="areaInfo.code">{{ areaInfo.name }}</option>
         </select>

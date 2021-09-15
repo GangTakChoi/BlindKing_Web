@@ -407,3 +407,8 @@
       display: none;
   }
 }
+
+/* custom 최강탁 */
+.ck-content p > img {
+  max-width: 100%;
+}
