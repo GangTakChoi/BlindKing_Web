@@ -2,6 +2,7 @@
   <div class="content-container">
     <div>
       <form>
+        <button class="btn btn-primary" type="submit" @click="test">test</button>
         <div class="form-row">
           <div class="col-md-6 mb-3">
             
@@ -159,8 +160,11 @@ export default {
       $('.toast').toast('show')
     },
     test : function () {
-      VueCookies.remove('token')
-      console.log(VueCookies.get('token'))
+      console.log('test')
+      this.$http.get('/test')
+      .then((response) => {
+        console.log(response.data)
+      })
     },
     get : function () {
       let config = {

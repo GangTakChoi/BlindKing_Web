@@ -30,12 +30,21 @@
         </select>
       </div>
 
-      <div class="form-group" v-for="(questionInfo, index) in questionList" :key="index">
-        <label for="exampleFormControlInput1">{{questionInfo.questionId.content}}</label>
-        <input v-if="questionInfo.questionId.inputType === 'input'" type="text" class="form-control" v-model="questionInfo.answer">
-        <textarea v-else-if="questionInfo.questionId.inputType === 'textarea'" class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
-        <textarea v-else class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
-      </div>
+      <template v-for="order in questionList.length">
+        <template v-for="(questionInfo, index) in questionList">
+          <div v-if="questionInfo.questionId.order === order" class="form-group" :key="index+order">
+            <div class="label-wrap">
+              <label for="exampleFormControlInput1">{{questionInfo.questionId.content}}</label>
+              <label class="text-length" :class="{ 'text-danger':  questionInfo.answer.length > 5000 }"> {{ questionInfo.answer.length + '/5000' }} </label>
+            </div>
+            
+            <input v-if="questionInfo.questionId.inputType === 'input'" type="text" class="form-control" v-model="questionInfo.answer">
+            <textarea v-else-if="questionInfo.questionId.inputType === 'textarea'" class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
+            <textarea v-else class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
+          </div>
+        </template>
+      </template>
+      
       
       <button type="submit" class="btn btn-primary btn-lg btn-block complete-btn" :disabled="isSaving">작성완료</button>
     </form>
@@ -48,6 +57,7 @@ export default {
   data: () => {
     return {
       isSaving: false,
+      userMBTI: '',
       mbtiList: [],
       selectUpperAreaCode: '',
       selectSubAreaCode: '',
@@ -72,8 +82,18 @@ export default {
         mbti: this.userMBTI,
       }
 
-      if (this.selectUpperAreaCode !== '' && this.selectSubAreaCode === '') {
-        alert('지역 선택을 완료해주세요.')
+      if (this.birthYear === 0) {
+        alert('출생년도는 필수 선택란입니다.')
+        return
+      }
+
+      if (this.userMBTI === '') {
+        alert('MBTI는 필수 선택란입니다.')
+        return
+      }
+
+      if (this.selectUpperAreaCode === '' || this.selectSubAreaCode === '') {
+        alert('지역은 필수 선택란입니다.')
         return
       }
       
@@ -83,13 +103,21 @@ export default {
       }
 
       let questionListUpdateInfo = []
+      let inputLengthLimitCheck = false
 
       this.questionList.forEach((element, index) => {
+        if (element.answer.length > 5000) inputLengthLimitCheck = true
+
         questionListUpdateInfo[index] = {
           answer: element.answer,
           questionId: element.questionId._id
         }
       })
+
+      if (inputLengthLimitCheck) {
+        alert("작성 내용중 5000자를 넘기는 응답란이 있습니다.")
+        return 
+      }
 
       reqBody.questionList = questionListUpdateInfo
 
@@ -104,6 +132,8 @@ export default {
       }).catch((error) => {
         alert('자기소개 작성이 실패하였습니다.')
         console.log(error);
+      }).finally(() => {
+        this.isSaving = false
       })
     }
   },
@@ -158,5 +188,12 @@ export default {
 }
 .complete-btn {
   margin-top: 30px;
+}
+.text-length {
+  display: inline-block;
+}
+.label-wrap {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
