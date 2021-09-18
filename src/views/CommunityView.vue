@@ -134,8 +134,13 @@ export default {
 
     },
     registComment: function () {
-      if (this.registCommentInput === '') {
+      if (this.registCommentInput.trim() === '') {
         alert('내용을 입력해주세요.')
+        return
+      }
+
+      if (this.registCommentInput.length > 5000) {
+        alert('댓글은 5000자 이내로 작성해주세요.')
         return
       }
 

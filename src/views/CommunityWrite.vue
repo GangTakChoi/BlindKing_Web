@@ -75,12 +75,16 @@ export default {
   },
   methods : {
     submit () {
-      if (this.title === '') {
+      if (this.title.trim() === '') {
         alert('제목을 입력해주세요.')
         return
       }
-      if (this.editorData === '') {
+      if (this.editorData.trim() === '') {
         alert('내용을 입력해주세요.')
+        return
+      }
+      if (this.title.length > 100) {
+        alert('제목은 100자 이내로 가능합니다.')
         return
       }
 
@@ -97,7 +101,11 @@ export default {
         this.$router.push('/community');
       })
       .catch((err) => {
+        alert('게시글 등록 중 오류가 발생하였습니다.')
         console.log(err)
+      })
+      .finally((response) => {
+        this.isRegistBoardLoading = false
       })
     },
   },
