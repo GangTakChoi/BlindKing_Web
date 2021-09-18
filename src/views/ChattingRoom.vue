@@ -7,7 +7,12 @@
       <div id="chatting-message-display">
         <div v-for="(msgInfo, key) in messageList" :key="key" 
           class="sppech-bubble-frame shadow" 
-          :class="{ 'your-sppech-bubble' : !msgInfo.isMe, 'my-sppech-bubble': msgInfo.isMe}">
+          :class="{ 
+            'female-sppech-bubble' : msgInfo.gender === 'female',
+            'male-sppech-bubble': msgInfo.gender === 'male',
+            'my-sppech-bubble': msgInfo.isMe,
+          }"
+        >
           {{msgInfo.message}}
         </div>
       </div>
@@ -93,10 +98,13 @@ export default {
       }
 
       await data.messageRecords.forEach((messaeInfo) => {
+        let myGender = VueCookies.get('gender')
+        let yourGender = myGender === 'male' ? 'female' : 'male'
         
         let isMe = messaeInfo.userObjectId === data.myObjectId  ? true : false
         let msgInfo = {
           isMe: isMe,
+          gender: isMe ? myGender : yourGender,
           message: messaeInfo.content
         }
         this.messageList.push(msgInfo)
@@ -107,9 +115,13 @@ export default {
     })
 
     this.socket.on("brodcastMessage", async (data) => {
+      let myGender = VueCookies.get('gender')
+      let yourGender = myGender === 'male' ? 'female' : 'male'
       let isMe = data.token === TOKEN ? true : false
+
       let msgInfo = {
         isMe: isMe,
+        gender: isMe ? myGender : yourGender,
         message: data.msg
       }
 
@@ -161,15 +173,16 @@ export default {
 .sppech-bubble-frame:not(:first-child) {
   margin-top: 40px;
 }
-.my-sppech-bubble {
+.male-sppech-bubble {
   background-color: #f3f3fd;
   color: black;
-  margin-left: auto;
 }
-.your-sppech-bubble {
+.female-sppech-bubble {
   background-color: #fff7f7;
   color: black;
-  // border: 1px solid black;
+}
+.my-sppech-bubble {
+  margin-left: auto;
 }
 
 .input-section {
