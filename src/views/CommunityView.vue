@@ -1,5 +1,10 @@
 <template>
   <div class="content-container">
+    
+    <div v-if="isResponseComplete && isMyBoard" class="board-controller-wrap">
+      <button class="shadow-sm" @click="moveModifyPage">글수정</button>
+      <button class="shadow-sm">글삭제</button>
+    </div>
     <div class="board-view-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
         <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
@@ -7,6 +12,7 @@
         </div>
       </div>
 
+      
       <div v-if="isResponseComplete">
         <div class="title">
           {{ title }}
@@ -80,6 +86,7 @@ export default {
   components: { CommentDeleteModal },
   data: () => {
     return {
+      isMyBoard: false,
       title: '',
       content: '',
       nickname: '',
@@ -222,10 +229,14 @@ export default {
         return String(num)
       }
     },
+    moveModifyPage: function () {
+      this.$router.push('/community-modify/' +this.$route.params.boardId)
+    },
     loadData: function () {
       this.$http.get('/community/board/' + this.$route.params.boardId)
       .then((response) => {
         let responseData = response.data.result
+        this.isMyBoard = responseData.isMyBoard
         this.title =  responseData.title
         this.content = responseData.content
         this.nickname = responseData.nickname
@@ -260,6 +271,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.board-controller-wrap {
+  margin-bottom: 10px;
+  text-align: right;
+  button {
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    border: 0;
+  }
+  button:not(:last-child) {
+    margin-right: 10px;
+  }
+}
+
 .comment-wrap {
   padding: 10px 5px;
   .comment-nickname {
@@ -290,7 +315,7 @@ export default {
   background-color: #fff;
   border-radius: 5px;
   width: 100%;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 .comment-textarea {
   -ms-overflow-style: none; /* IE and Edge */

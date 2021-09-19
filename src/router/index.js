@@ -53,9 +53,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "write-community" */ '../views/CommunityWrite.vue')
   },
   {
+    path: '/community-modify/:boardId',
+    name: 'CommunityModify',
+    component: () => import(/* webpackChunkName: "modify-community" */ '../views/CommunityModify.vue')
+  },
+  {
     path: '/community/detail/:boardId',
     name: 'CommunityView',
-    component: () => import(/* webpackChunkName: "write-community" */ '../views/CommunityView.vue')
+    component: () => import(/* webpackChunkName: "view-community" */ '../views/CommunityView.vue')
   },
   {
     path: '/test',
