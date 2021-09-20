@@ -3,7 +3,7 @@
     
     <div v-if="isResponseComplete && isMyBoard" class="board-controller-wrap">
       <button class="shadow-sm" @click="moveModifyPage">글수정</button>
-      <button class="shadow-sm">글삭제</button>
+      <button class="shadow-sm" @click="deleteBoard">글삭제</button>
     </div>
     <div class="board-view-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
@@ -105,6 +105,21 @@ export default {
     }
   },
   methods: {
+    deleteBoard: function () {
+      if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) {
+        return
+      }
+
+      this.$http.delete("/community/board/" + this.$route.params.boardId)
+      .then((response) => {
+        alert("삭제를 완료했습니다.")
+        history.back()
+      })
+      .catch((error) => {
+        console.log(error)
+        alert("게시글 삭제 중 오류가 발생하였습니다.")
+      })
+    },
     commentDeleteComplete: function (commmentId) {
       const delectCommentIndex = this.commentInfoList.findIndex(
         (commentInfo) =>{
