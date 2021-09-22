@@ -33,24 +33,29 @@
         </button>
       </router-link>
       <router-link to="/friends">
-        <button class="friends-button basic-button-design shadow-sm rounded">
+        <button class="basic-button-design shadow-sm rounded">
           친구목록
         </button>
       </router-link>
       <router-link to="/community">
-        <button class="friends-button basic-button-design shadow-sm rounded">
+        <button class="basic-button-design shadow-sm rounded">
           커뮤니티
+        </button>
+      </router-link>
+      <router-link to="/mypage">
+        <button class="basic-button-design shadow-sm rounded">
+          내정보
         </button>
       </router-link>
       <!-- <router-link to="www.naver.com" target="_blank"> -->
       <a href="https://toon.at/donate/637662824189086998" target="_blank">
-        <button class="friends-button basic-button-design shadow-sm rounded">
+        <button class="basic-button-design shadow-sm rounded">
           후원하기
         </button>
       </a>
       <!-- </router-link> -->
       <router-link to="/test">
-        <button class="friends-button basic-button-design shadow-sm rounded">
+        <button class="basic-button-design shadow-sm rounded">
           test
         </button>
       </router-link>

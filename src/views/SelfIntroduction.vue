@@ -138,7 +138,7 @@ export default {
     }
   },
   created () {
-    this.$http.get('/user/me').then(async (response) => {
+    this.$http.get('/user/self-introduction').then(async (response) => {
       if (response.status === 200) {
         // 유저 정보
         let userInfo = response.data.userInfo

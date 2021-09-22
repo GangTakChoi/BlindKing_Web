@@ -1,6 +1,11 @@
 <template>
   <div class="content-container">
-    <form @submit.prevent="submit">
+    <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
+      <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <form v-else @submit.prevent="submit">
       <div class="title-input-wrap shadow-sm">
         <input type="text" class="title-input" v-model="title">
       </div>
@@ -24,6 +29,7 @@ export default {
   name: "CommunityWrite",
   data: () => {
     return {
+      isResponseComplete: false,
       isRegistBoardLoading: false,
       title: '',
       editor: ClassicEditor,
@@ -114,6 +120,7 @@ export default {
     .then((response) => {
       this.title = response.data.result.title
       this.editorData = response.data.result.content
+      this.isResponseComplete = true
     })
     .catch((error) => {
       alert("페이지 로드 중 오류가 발생했습니다.")

@@ -63,6 +63,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "view-community" */ '../views/CommunityView.vue')
   },
   {
+    path: '/mypage',
+    name: 'MyPage',
+    component: () => import(/* webpackChunkName: "mypage" */ '../views/MyPage.vue')
+  },
+  {
     path: '/test',
     name: 'Test',
     component: () => import(/* webpackChunkName: "test" */ '../views/Test.vue')
