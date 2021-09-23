@@ -1,6 +1,6 @@
 <template>
   <div class="content-container">
-    <div class="title">내정보</div>
+    <div class="wrap-title">내정보</div>
     <div class="myinfo-wrap shadow" id="myInfoWrap">
       <div class="mb-3 row">
         <label for="nickname" class="col-sm-2 col-form-label">닉네임</label>
@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <div class="title">나의 게시글</div>
+    <div class="wrap-title">나의 게시글</div>
     <div class="myinfo-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
         <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
@@ -23,17 +23,31 @@
         </div>
       </div>
       <div v-else v-for="(boardInfo, index) in boardList" :key="index" class="list-row">
-        <router-link :to="'/community/detail/' + boardInfo._id">
-          {{ boardInfo.title }}
-        </router-link>
+        <span class="row-title">
+          <router-link :to="'/community/detail/' + boardInfo._id">
+            {{ boardInfo.title }}
+          </router-link>
+          <span style="opacity:0.6">[{{ boardInfo.commentCount }}]</span>
+        </span>
+        <span class="row-detail">
+          {{ getDate(boardInfo.createdAt) }} • 
+          조회수 {{ boardInfo.view }} • 
+          좋아요 {{ boardInfo.like }} • 
+          싫어요 {{ boardInfo.dislike }}
+        </span>
       </div>
       <div v-if="isResponseComplete && isMoreBoardButton" class="list-row">
-        <button class="more-button" @click="moreLoadboard">
+        <div v-if="isLoadingBoardInfo" class="d-flex justify-content-center" style="margin: 40px 0">
+          <div class="spinner-border" role="status" style="width: 2rem; height: 2rem;">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <button v-else class="more-button" @click="moreLoadboard">
           더 보기
         </button>
       </div>
     </div>
-    <div class="title">나의 댓글</div>
+    <div class="wrap-title">나의 댓글</div>
     <div class="myinfo-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
         <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
@@ -41,13 +55,28 @@
         </div>
       </div>
       <div v-else v-for="(commentInfo, index) in commentList" :key="index" class="list-row">
-        <router-link :to="'/community/detail/' + commentInfo.boardId._id">
+        <span class="row-title row-comment-content">
           {{ commentInfo.content }}
-        </router-link>
-        <!-- <hr v-if="commentList.length !== index + 1"> -->
+        </span>
+        <span class="row-detail">
+          {{ getDate(commentInfo.createdAt) }} • 
+          좋아요 {{ commentInfo.like }}
+        </span>
+        <span class="row-detail">
+          <router-link :to="'/community/detail/' + commentInfo.boardId._id">
+            {{ commentInfo.boardId.title }}
+          </router-link>
+          {{ ' 게시글에 남긴 댓글'}} 
+        </span>
+        <hr v-if="commentList.length !== index + 1">
       </div>
       <div v-if="isResponseComplete && isMoreCommentButton" class="list-row">
-        <button class="more-button" @click="moreLoadComment">
+        <div v-if="isLoadingCommentInfo" class="d-flex justify-content-center" style="margin: 40px 0">
+          <div class="spinner-border" role="status" style="width: 2rem; height: 2rem;">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <button v-else class="more-button" @click="moreLoadComment">
           더 보기
         </button>
       </div>
@@ -71,10 +100,18 @@ export default {
       commentList: [],
       isMoreBoardButton: true,
       isMoreCommentButton: true,
+      isLoadingCommentInfo: false,
+      isLoadingBoardInfo: false,
     }
   },
   methods: {
+    getDate: function (createdAt) {
+      let dateInfo = this.convertDateToTimestamp(createdAt)
+
+      return dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day
+    },
     moreLoadComment: function () {
+      this.isLoadingCommentInfo = true
       this.$http.get('/user/mypage?commentSkip=' + this.commentList.length)
       .then((response) => {
         this.commentList = this.commentList.concat(response.data.commentList)
@@ -85,8 +122,12 @@ export default {
       .catch((error) => {
         alert(error.response.data.errorMessage)
       })
+      .finally(() => {
+        this.isLoadingCommentInfo = false
+      })
     },
     moreLoadboard: function () {
+      this.isLoadingBoardInfo = true
       this.$http.get('/user/mypage?boardSkip=' + this.boardList.length)
       .then((response) => {
         this.boardList = this.boardList.concat(response.data.boardList)
@@ -96,6 +137,9 @@ export default {
       })
       .catch((error) => {
         alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.isLoadingBoardInfo = false
       })
     }
   },
@@ -127,6 +171,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.row-title {
+  word-break: break-all;
+  display: block;
+  width: 100%;
+}
+.row-detail {
+  word-break: break-all;
+  display: block;
+  font-size: 14px;
+  opacity: 0.6;
+}
+.row-detail:not(:last-child) {
+  margin-bottom: 5px;
+}
+.row-comment-content {
+  background-color: #eeeeee;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
 .more-button {
   border-radius: 5px;;
   border: 0;
@@ -145,7 +209,7 @@ export default {
 .list-row:not(:last-child) {
   margin-bottom: 10px;
 }
-.title {
+.wrap-title {
   font-size: 16px;
   margin-bottom: 10px;
 

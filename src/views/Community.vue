@@ -202,10 +202,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.content-container {
-  width: 90%;
-  max-width: 1300px;
-}
 .input-group {
   background-color: #fff;
   margin-bottom: 20px;
@@ -220,9 +216,6 @@ export default {
   thead {
     font-size: 14px;
     text-align: center;
-    .title {
-      text-align: left;
-    }
   }
   th {
     border-top: 0;

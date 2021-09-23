@@ -53,23 +53,31 @@
         </div>
       </div>
       <div v-if="commentInfoList.length === 0 && !isCommentRegistLoading" class="text-center">등록된 댓글이 없습니다.</div>
-
-      
-      <!-- <div v-else v-for="(commentInfo, index) in commentInfoList" :key="index" class="comment-upper-wrap"> -->
-      <div v-else v-for="(commentInfo, index) in commentInfoList" :key="index" class="comment-wrap">
-        <div class="comment-nickname">
-          {{ commentInfo.nickname }}
+      <template v-else>
+        <select class="custom-select" id="inlineFormCustomSelectPref" @change="selectCommentOrder">
+          <option selected value="latest">최신순</option>
+          <option value="popular">인기순</option>
+        </select>
+        <div v-if="isCommentOrderChangeLoading" class="d-flex justify-content-center m-3">
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
-        <div class="comment-created-date">
-          {{ getCommentDate(commentInfo.createdDate) }}
+        <div v-else class="comment-wrap" v-for="(commentInfo, index) in commentInfoList" :key="index">
+          <div class="comment-nickname">
+            {{ commentInfo.nickname }}
+          </div>
+          <div class="comment-created-date">
+            {{ getCommentDate(commentInfo.createdDate) }}
+          </div>
+          <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + index" type="button" class="close" aria-label="Close" @click="deleteComment(commentInfo, index, $event)" data-toggle="modal" data-target="#exampleModal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <div class="comment-content">
+            {{ commentInfo.content }}
+          </div>
         </div>
-        <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + index" type="button" class="close" aria-label="Close" @click="deleteComment(commentInfo, index, $event)" data-toggle="modal" data-target="#exampleModal">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <div class="comment-content">
-          {{ commentInfo.content }}
-        </div>
-      </div>
+      </template>
       <!-- </div> -->
 
       <CommentDeleteModal :commentInfo="deleteCommentInfo" :boardId="$route.params.boardId" @commentDeleteComplete="commentDeleteComplete" />
@@ -98,6 +106,7 @@ export default {
       isHandUp: false,
       isHandDown: false,
       isCommentRegistLoading: false,
+      isCommentOrderChangeLoading: false,
       isCommentRegistButtonActivity: true,
       deleteCommentInfo: {},
       like: Number,
@@ -105,6 +114,22 @@ export default {
     }
   },
   methods: {
+    selectCommentOrder: function (e) {
+      let order = e.target.value
+      this.isCommentOrderChangeLoading = true
+
+      this.$http.get('community/board/' + this.$route.params.boardId + '/comment?order=' + order)
+      .then((response) => {
+        this.commentInfoList = response.data.commentList
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.isCommentOrderChangeLoading = false
+      })
+    },
     deleteBoard: function () {
       if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) {
         return
@@ -274,7 +299,7 @@ export default {
       })
       .catch((e) => {
         console.log(e)
-        alert("페이지 로드 중 에러가 발생하였습니다.")
+        alert(e.response.data.errorMessage)
         history.back()
       })
     },
@@ -286,6 +311,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.custom-select {
+  width: 100px;
+}
 .board-controller-wrap {
   margin-bottom: 10px;
   text-align: right;
@@ -351,6 +379,7 @@ hr {
 }
 .title {
   width: 100%;
+  word-break: break-all;
   // font-weight: bold;
   font-size: 1.8rem;
   text-align: center;
