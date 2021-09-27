@@ -22,6 +22,9 @@
           <span class="sr-only">Loading...</span>
         </div>
       </div>
+      <div v-else-if="boardList.length <= 0">
+        등록된 게시글이 없습니다.
+      </div>
       <div v-else v-for="(boardInfo, index) in boardList" :key="index" class="list-row">
         <span class="row-title">
           <router-link :to="'/community/detail/' + boardInfo._id">
@@ -54,8 +57,11 @@
           <span class="sr-only">Loading...</span>
         </div>
       </div>
+      <div v-else-if="commentList.length <= 0">
+        등록된 댓글이 없습니다.
+      </div>
       <div v-else v-for="(commentInfo, index) in commentList" :key="index" class="list-row">
-        <span class="row-title row-comment-content">
+        <span class="row-comment-content">
           {{ commentInfo.content }}
         </span>
         <span class="row-detail">
@@ -70,6 +76,7 @@
         </span>
         <hr v-if="commentList.length !== index + 1">
       </div>
+      
       <div v-if="isResponseComplete && isMoreCommentButton" class="list-row">
         <div v-if="isLoadingCommentInfo" class="d-flex justify-content-center" style="margin: 40px 0">
           <div class="spinner-border" role="status" style="width: 2rem; height: 2rem;">
@@ -149,7 +156,6 @@ export default {
 
     this.$http.get('/user/mypage')
     .then((response) => {
-      console.log(response.data)
       this.boardList = response.data.boardList
       this.commentList = response.data.commentList
       this.isResponseComplete = true
@@ -158,7 +164,7 @@ export default {
         this.isMoreBoardButton = false
       }
 
-      if (response.data.commentList < LOAD_LIMIT) {
+      if (response.data.commentList.length < LOAD_LIMIT) {
         this.isMoreCommentButton = false
       }
     })
@@ -175,6 +181,7 @@ export default {
   word-break: break-all;
   display: block;
   width: 100%;
+  font-size: 18px;
 }
 .row-detail {
   word-break: break-all;
@@ -186,10 +193,18 @@ export default {
   margin-bottom: 5px;
 }
 .row-comment-content {
+  display: block;
+  word-break: break-all;
+  width: 100%;
   background-color: #eeeeee;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 6px;
   margin-bottom: 10px;
+}
+@media (max-width: 768px) {
+  .row-comment-content {
+    font-size: 14px;
+  }
 }
 .more-button {
   border-radius: 5px;;

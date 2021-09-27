@@ -28,12 +28,12 @@
         </div>
         <div class="hand-thumbs-wrap">
           <div class="hand-thumbs-up-wrap" @click="evaluateBoard(true)">
-            <img v-if="isHandUp" class="hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
+            <img v-if="isBoardHandUp" class="hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
             <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-up.svg">
             <span class="like">{{ like }}</span>
           </div>
           <div class="hand-thumbs-down-wrap" @click="evaluateBoard(false)">
-            <img v-if="isHandDown" class="hand-thumbs" src="@/assets/img/hand-thumbs-down-fill.svg">
+            <img v-if="isBoardHandDown" class="hand-thumbs" src="@/assets/img/hand-thumbs-down-fill.svg">
             <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-down.svg">
             <span class="dislike">{{ dislike }}</span>
           </div>
@@ -47,18 +47,18 @@
 
 
     <div v-if="isResponseComplete" class="comment-section shadow">
-      <div v-if="isCommentRegistLoading" class="d-flex justify-content-center m-3">
-        <div class="spinner-border" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
       <div v-if="commentInfoList.length === 0 && !isCommentRegistLoading" class="text-center">등록된 댓글이 없습니다.</div>
       <template v-else>
         <select class="custom-select" id="inlineFormCustomSelectPref" @change="selectCommentOrder">
           <option selected value="latest">최신순</option>
           <option value="popular">인기순</option>
         </select>
-        <div v-if="isCommentOrderChangeLoading" class="d-flex justify-content-center m-3">
+        <div v-if="isCommentRegistLoading" class="d-flex justify-content-center m-3">
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <div v-if="isCommentDataLoading" class="d-flex justify-content-center m-3">
           <div class="spinner-border" role="status">
             <span class="sr-only">Loading...</span>
           </div>
@@ -75,6 +75,14 @@
           </button>
           <div class="comment-content">
             {{ commentInfo.content }}
+          </div>
+          <div class="add-action">
+            <div class="comment-hand-thumbs-up-wrap" @click="evaluateComment(commentInfo.objectId, 'like')">
+              <img v-if="commentInfo.evaluation === 'like'" class="comment-hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
+              <img v-else class="comment-hand-thumbs" src="@/assets/img/hand-thumbs-up.svg">
+              <span v-if="commentInfo.like > 0" class="like">{{ commentInfo.like }}</span>
+            </div>
+            <span class="reply-comment">답글</span>
           </div>
         </div>
       </template>
@@ -103,10 +111,10 @@ export default {
       commentInfoList: [],
       registCommentInput: '',
       isResponseComplete: false,
-      isHandUp: false,
-      isHandDown: false,
+      isBoardHandUp: false,
+      isBoardHandDown: false,
       isCommentRegistLoading: false,
-      isCommentOrderChangeLoading: false,
+      isCommentDataLoading: false,
       isCommentRegistButtonActivity: true,
       deleteCommentInfo: {},
       like: Number,
@@ -116,7 +124,7 @@ export default {
   methods: {
     selectCommentOrder: function (e) {
       let order = e.target.value
-      this.isCommentOrderChangeLoading = true
+      this.isCommentDataLoading = true
 
       this.$http.get('community/board/' + this.$route.params.boardId + '/comment?order=' + order)
       .then((response) => {
@@ -127,7 +135,7 @@ export default {
         alert(error.response.data.errorMessage)
       })
       .finally(() => {
-        this.isCommentOrderChangeLoading = false
+        this.isCommentDataLoading = false
       })
     },
     deleteBoard: function () {
@@ -229,30 +237,30 @@ export default {
       this.$http.put('/community/board/' + this.$route.params.boardId + '/like-dislike', postBody)
       .then((response) => {
         if (isLike) {
-          if (this.isHandUp) {
-            this.isHandUp = false
+          if (this.isBoardHandUp) {
+            this.isBoardHandUp = false
             this.like -= 1
-          } else if (this.isHandDown) {
-            this.isHandUp = true
-            this.isHandDown = false
+          } else if (this.isBoardHandDown) {
+            this.isBoardHandUp = true
+            this.isBoardHandDown = false
             this.dislike -= 1
             this.like += 1
           } else {
-            this.isHandUp = true
+            this.isBoardHandUp = true
             this.like += 1
           }
 
         } else {
-          if (this.isHandUp) {
-            this.isHandUp = false
-            this.isHandDown = true
+          if (this.isBoardHandUp) {
+            this.isBoardHandUp = false
+            this.isBoardHandDown = true
             this.like -= 1
             this.dislike += 1
-          } else if (this.isHandDown) {
-            this.isHandDown = false
+          } else if (this.isBoardHandDown) {
+            this.isBoardHandDown = false
             this.dislike -= 1
           } else {
-            this.isHandDown = true
+            this.isBoardHandDown = true
             this.dislike += 1
           }
         }
@@ -272,7 +280,7 @@ export default {
     moveModifyPage: function () {
       this.$router.push('/community-modify/' +this.$route.params.boardId)
     },
-    loadData: function () {
+    loadBoardData: function () {
       this.$http.get('/community/board/' + this.$route.params.boardId)
       .then((response) => {
         let responseData = response.data.result
@@ -288,12 +296,10 @@ export default {
         this.createdDate = dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day + ' ' + dateInfo.hours + ':' + dateInfo.minutes
 
         if (responseData.evaluation === 'like') {
-          this.isHandUp = true
+          this.isBoardHandUp = true
         } else if (responseData.evaluation === 'dislike') {
-          this.isHandDown = true
+          this.isBoardHandDown = true
         }
-
-        this.commentInfoList = responseData.boardCommentInfoList
 
         this.isResponseComplete = true
       })
@@ -303,14 +309,74 @@ export default {
         history.back()
       })
     },
+    evaluateComment: function (commentId, status) {
+      let postBody = {
+        status: status
+      }
+
+      this.$http.put(`community/board/${this.$route.params.boardId}/comment/${commentId}`, postBody)
+      .then((response) => {
+        const updatedCommentIndex = this.commentInfoList.findIndex((commentInfo) => {
+          if (commentInfo.objectId === commentId) return true
+        })
+
+        this.commentInfoList[updatedCommentIndex].like = response.data.commentInfo.like
+        this.commentInfoList[updatedCommentIndex].evaluation = response.data.commentInfo.evaluation
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
+    loadCommentData: function () {
+      this.isCommentDataLoading = true
+
+      this.$http.get('community/board/' + this.$route.params.boardId + '/comment?order=latest')
+      .then((response) => {
+        this.commentInfoList = response.data.commentList
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.isCommentDataLoading = false
+      })
+    },
   },
   created () {
-    this.loadData()
+    this.loadBoardData()
+    this.loadCommentData()
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.add-action {
+  margin-top: 10px;
+  .comment-hand-thumbs-up-wrap {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 20px;
+    .comment-hand-thumbs {
+      margin-right: 11px;
+      width: 16px;
+    }
+    .like {
+      position: relative;
+      top: 1px;
+      display: inline-block;
+    }
+  }
+  .reply-comment {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 16px;
+    vertical-align: bottom;
+  }
+}
+
 .custom-select {
   width: 100px;
 }
@@ -343,7 +409,7 @@ export default {
   .comment-content {
     white-space: pre-line;
     word-break: break-word;
-    margin-top: 10px;
+    margin-top: 5px;
   }
 }
 .comment-section {
