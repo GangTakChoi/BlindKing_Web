@@ -4,7 +4,7 @@
       <button class="btn btn-primary" @click="moveWritePage">글쓰기</button>
     </div>
     <table class="table shadow-sm">
-      <thead class="thead-dark">
+      <!-- <thead class="thead-dark">
         <tr>
           <th scope="col" class="title">제목</th>
           <th scope="col" class="nickname">작성자</th>
@@ -12,7 +12,7 @@
           <th scope="col" class="views">조회수</th>
           <th scope="col" class="like">추천수</th>
         </tr>
-      </thead>
+      </thead> -->
       <tbody>
         <tr v-for="(boardInfo, key) in boardList" :key="key" @click="moveBoardView(boardInfo.Objectid)">
           <td scope="row">{{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></td>

@@ -82,7 +82,38 @@
               <img v-else class="comment-hand-thumbs" src="@/assets/img/hand-thumbs-up.svg">
               <span v-if="commentInfo.like > 0" class="like">{{ commentInfo.like }}</span>
             </div>
-            <span class="reply-comment">답글</span>
+
+            <span class="reply-comment" @click="showInputBoxSubCommentIndex = index">답글</span>
+            <span v-if="commentInfo.subCommentCount > 0" class="subcomment-info-text" @click="loadSubComment(commentInfo.objectId)">
+              {{ showSubCommentIdBundleList.includes(commentInfo.objectId) ? 
+              `${commentInfo.subCommentCount}개의 답글 숨기기` :
+              `${commentInfo.subCommentCount}개의 답글 보기`
+              }}
+            </span>
+            <div v-if="showInputBoxSubCommentIndex === index">
+              <textarea :ref="`subCommentTextarea-${commentInfo.objectId}`" class="form-control comment-reply-textarea" id="" rows="1"></textarea>
+              <div class="comment-reply-button-wrap">
+                <button type="button" class="btn btn-dark comment-reply-regist" @click="registSubComment(commentInfo.objectId)">등록</button>
+                <button type="button" class="btn btn-light comment-reply-cancel" @click="showInputBoxSubCommentIndex = null">취소</button>
+              </div>
+            </div>
+
+            <div v-if="showSubCommentIdBundleList.includes(commentInfo.objectId)" class="subcomment-wrap">
+              <div class="subcomment-detail-wrap" v-for="(subCommentInfo, index) in subCommentInfoWrap[commentInfo.objectId]" :key="index">
+                <div class="comment-nickname">
+                  {{ subCommentInfo.nickname }}
+                </div>
+                <div class="comment-created-date">
+                  {{ getCommentDate(subCommentInfo.createdDate) }}
+                </div>
+                <button v-if="subCommentInfo.isMine" :id="'deleteCommentButton' + index" type="button" class="close" aria-label="Close" @click="deleteComment(subCommentInfo, index, $event)" data-toggle="modal" data-target="#exampleModal">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="comment-content">
+                  {{ subCommentInfo.content }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </template>
@@ -117,6 +148,12 @@ export default {
       isCommentDataLoading: false,
       isCommentRegistButtonActivity: true,
       deleteCommentInfo: {},
+      showInputBoxSubCommentIndex: null,
+      showSubCommentIdBundleList: [],
+      subCommentInfoWrap: {
+        // 'commentId': [{subCommentInfo},{subCommentInfo},{subCommentInfo}],
+        // 'commentId': [{subCommentInfo},{subCommentInfo},{subCommentInfo}]
+      },
       like: Number,
       dislike: Number,
     }
@@ -153,6 +190,29 @@ export default {
         alert("게시글 삭제 중 오류가 발생하였습니다.")
       })
     },
+    loadSubComment: function (rootCommentId) {
+      if (this.subCommentInfoWrap[rootCommentId] !== undefined) {
+        if (this.showSubCommentIdBundleList.includes(rootCommentId)) {
+          this.showSubCommentIdBundleList = this.showSubCommentIdBundleList.filter((commentId) => {
+            commentId !== rootCommentId
+          })
+        } else {
+          this.showSubCommentIdBundleList.push(rootCommentId)
+        }
+
+        return
+      }
+
+      this.$http.get(`/community/board/${this.$route.params.boardId}/comment/${rootCommentId}/sub-comment`)
+      .then((response) => {
+        this.$set( this.subCommentInfoWrap, rootCommentId, response.data.subCommentList )
+        this.showSubCommentIdBundleList.push(rootCommentId)
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+    },
     commentDeleteComplete: function (commmentId) {
       const delectCommentIndex = this.commentInfoList.findIndex(
         (commentInfo) =>{
@@ -172,9 +232,9 @@ export default {
       let commentTextarea = $('.comment-textarea');
       let scrollHeight = commentTextarea.prop('scrollHeight');
       let innerHeight = commentTextarea.innerHeight()
-
+      
       if (scrollHeight > innerHeight) {
-        commentTextarea.css('height', scrollHeight + 10)
+        commentTextarea.css('height', scrollHeight)
       }
     },
     getCommentDate: function (timestamp) {
@@ -188,6 +248,48 @@ export default {
     refreshData: function () {
 
     },
+    registSubComment: function (commentId) {
+      let content = this.$refs[`subCommentTextarea-${commentId}`][0].value
+
+      if (content.trim() === '') {
+        alert('내용을 입력해주세요.')
+        return
+      }
+
+      if (content.length > 5000) {
+        alert('댓글은 5000자 이내로 작성해주세요')
+        return
+      }
+
+      let postBody = {
+        content: content
+      }
+
+      this.$http.post(`/community/board/${this.$route.params.boardId}/comment/${commentId}/sub-comment`, postBody)
+      .then((response) => {
+        let registedCommentInfo = response.data.commentInfo
+        this.showInputBoxSubCommentIndex = null
+        if (this.subCommentInfoWrap[commentId] === undefined) {
+
+          this.$http.get(`/community/board/${this.$route.params.boardId}/comment/${commentId}/sub-comment`)
+          .then((response) => {
+            this.$set( this.subCommentInfoWrap, commentId, response.data.subCommentList )
+          })
+          .catch((error) => {
+            console.log(error)
+            alert(error.response.data.errorMessage)
+          })
+        } else {
+          this.$set( this.subCommentInfoWrap, commentId, this.subCommentInfoWrap[commentId].concat([registedCommentInfo]) )
+        }
+
+        this.showSubCommentIdBundleList.push(commentId)
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+    },
     registComment: function () {
       if (this.registCommentInput.trim() === '') {
         alert('내용을 입력해주세요.')
@@ -198,6 +300,8 @@ export default {
         alert('댓글은 5000자 이내로 작성해주세요.')
         return
       }
+
+      this.showInputBoxSubCommentIndex = null
 
       let postBody = {
         content: this.registCommentInput
@@ -351,14 +455,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .add-action {
   margin-top: 10px;
   .comment-hand-thumbs-up-wrap {
     display: inline-block;
     cursor: pointer;
-    margin-right: 20px;
+    width: 60px;
     .comment-hand-thumbs {
-      margin-right: 11px;
+      margin-right: 8px;
       width: 16px;
     }
     .like {
@@ -367,13 +472,43 @@ export default {
       display: inline-block;
     }
   }
-  .reply-comment {
+  .reply-comment, .subcomment-info-text {
     position: relative;
     top: 1px;
     display: inline-block;
     cursor: pointer;
     font-size: 16px;
     vertical-align: bottom;
+  }
+  .comment-reply-textarea {
+    margin-top: 15px;
+  }
+  .comment-reply-button-wrap {
+    text-align: left;
+    margin-top: 12px;
+    .comment-reply-cancel {
+      margin-left: 8px;
+    }
+  }
+  .subcomment-info-text {
+    cursor: pointer;
+    color: #007bff;
+    margin-left: 20px;
+  }
+  .subcomment-wrap {
+    margin-top: 20px;
+    margin-left: 60px;
+    .subcomment-detail-wrap {
+      padding: 10px 20px;
+      background-color: #eeeeee;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  }
+  @media (max-width: 768px) {
+    .subcomment-wrap {
+      margin-left: 0;
+    }
   }
 }
 
