@@ -70,7 +70,8 @@
           <div class="comment-created-date">
             {{ getCommentDate(commentInfo.createdDate) }}
           </div>
-          <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + index" type="button" class="close" aria-label="Close" @click="deleteComment(commentInfo, index, $event)" data-toggle="modal" data-target="#exampleModal">
+          <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + commentInfo.objectId" type="button" class="close" aria-label="Close" 
+          @click="deleteComment(commentInfo)" data-toggle="modal" data-target="#exampleModal">
             <span aria-hidden="true">&times;</span>
           </button>
           <div class="comment-content">
@@ -106,7 +107,9 @@
                 <div class="comment-created-date">
                   {{ getCommentDate(subCommentInfo.createdDate) }}
                 </div>
-                <button v-if="subCommentInfo.isMine" :id="'deleteCommentButton' + index" type="button" class="close" aria-label="Close" @click="deleteComment(subCommentInfo, index, $event)" data-toggle="modal" data-target="#exampleModal">
+                <button v-if="subCommentInfo.isMine" 
+                :id="'deleteCommentButton' + subCommentInfo.objectId" type="button" class="close" aria-label="Close" 
+                @click="deleteComment(subCommentInfo)" data-toggle="modal" data-target="#exampleModal">
                   <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="comment-content">
@@ -213,20 +216,30 @@ export default {
         alert(error.response.data.errorMessage)
       })
     },
-    commentDeleteComplete: function (commmentId) {
-      const delectCommentIndex = this.commentInfoList.findIndex(
-        (commentInfo) =>{
-          return commentInfo.objectId === commmentId
-        }
-      )
+    commentDeleteComplete: function (deletedCommentInfo) {
+      if (deletedCommentInfo.isSubComment) {
+        let subCommentList = this.subCommentInfoWrap[deletedCommentInfo.rootCommentId]
 
-      this.commentInfoList.splice(delectCommentIndex, 1)
+        const delectCommentIndex = subCommentList.findIndex((commentInfo) =>{
+          return commentInfo.objectId === deletedCommentInfo.commentId
+        })
+
+        if (delectCommentIndex === -1) return
+
+        subCommentList.splice(delectCommentIndex, 1)
+        this.$set( this.subCommentInfoWrap, deletedCommentInfo.rootCommentId, subCommentList )
+      } else {
+        const delectCommentIndex = this.commentInfoList.findIndex((commentInfo) =>{
+          return commentInfo.objectId === deletedCommentInfo.commentId
+        })
+
+        if (delectCommentIndex === -1) return
+
+        this.commentInfoList.splice(delectCommentIndex, 1)
+      }
     },
-    deleteComment: function (commentInfo, index, e) {
-      e.stopPropagation()
+    deleteComment: function (commentInfo) {
       this.deleteCommentInfo = commentInfo
-
-      $('#deleteCommentButton' + index).click()
     },
     autoHeightTextarea: function () {
       let commentTextarea = $('.comment-textarea');

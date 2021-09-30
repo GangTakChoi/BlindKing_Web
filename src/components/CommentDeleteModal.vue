@@ -44,17 +44,24 @@ export default {
   },
   methods: {
     deleteComment: function () {
-      let commmentId = this.commentInfo.objectId
+      let commentId = this.commentInfo.objectId
 
       this.isDeleteLoading = true
 
-      this.$http.delete("/community/board/" + this.boardId + "/comment/" + commmentId)
+      this.$http.delete("/community/board/" + this.boardId + "/comment/" + commentId)
       .then((response) => {
         if (response.status === 200) {
           this.isDeleteLoading = false
+
+          let deleteCommentInfo = {
+            commentId: commentId,
+            isSubComment: response.data.isSubComment,
+            rootCommentId: response.data.rootCommentId,
+          }
+
           alert("댓글이 삭제되었습니다.")
-          this.$emit("commentDeleteComplete", commmentId)
-          $(".close").click()
+          this.$emit("commentDeleteComplete", deleteCommentInfo)
+          $(".modal-header .close").click()
         } else {
           alert("댓글 삭제 중 오류가 발생하였습니다.\n다시 한번 시도해 주세요.\n문제가 지속되는 경우 문의부탁드립니다.")
         }
@@ -65,7 +72,7 @@ export default {
       })
     },
     cancel: function () {
-      $(".close").click()
+      $(".modal-header .close").click()
     }
   }
 }
