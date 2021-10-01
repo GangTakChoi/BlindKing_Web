@@ -30,16 +30,16 @@
           <div class="hand-thumbs-up-wrap" @click="evaluateBoard(true)">
             <img v-if="isBoardHandUp" class="hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
             <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-up.svg">
-            <span class="like">{{ like }}</span>
+            <span class="like">{{ like.toLocaleString('ko-KR') }}</span>
           </div>
           <div class="hand-thumbs-down-wrap" @click="evaluateBoard(false)">
             <img v-if="isBoardHandDown" class="hand-thumbs" src="@/assets/img/hand-thumbs-down-fill.svg">
             <img v-else class="hand-thumbs" src="@/assets/img/hand-thumbs-down.svg">
-            <span class="dislike">{{ dislike }}</span>
+            <span class="dislike">{{ dislike.toLocaleString('ko-KR') }}</span>
           </div>
         </div>
         <div v-if="isResponseComplete" class="comment-input-section">
-          <textarea class="form-control comment-textarea" row="3" v-model="registCommentInput" @keyup="autoHeightTextarea"></textarea>
+          <textarea class="form-control comment-textarea" v-model="registCommentInput" @keyup="autoHeightTextarea"></textarea>
           <button class="btn btn-primary comment-regist-button" @click="registComment" :disabled="!isCommentRegistButtonActivity">등록</button>
         </div>
       </div>
@@ -81,7 +81,7 @@
             <div class="comment-hand-thumbs-up-wrap" @click="evaluateComment(commentInfo.objectId, 'like')">
               <img v-if="commentInfo.evaluation === 'like'" class="comment-hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
               <img v-else class="comment-hand-thumbs" src="@/assets/img/hand-thumbs-up.svg">
-              <span v-if="commentInfo.like > 0" class="like">{{ commentInfo.like }}</span>
+              <span v-if="commentInfo.like > 0" class="like">{{ convertNumberUnit(commentInfo.like) }}</span>
             </div>
 
             <span class="reply-comment" @click="showInputBoxSubCommentIndex = index">답글</span>
@@ -92,7 +92,7 @@
               }}
             </span>
             <div v-if="showInputBoxSubCommentIndex === index">
-              <textarea :ref="`subCommentTextarea-${commentInfo.objectId}`" class="form-control comment-reply-textarea" id="" rows="1"></textarea>
+              <textarea :ref="`subCommentTextarea-${commentInfo.objectId}`" @keyup="autoHeightTextarea" class="form-control comment-reply-textarea" id="" rows="1" ></textarea>
               <div class="comment-reply-button-wrap">
                 <button type="button" class="btn btn-dark comment-reply-regist" @click="registSubComment(commentInfo.objectId)">등록</button>
                 <button type="button" class="btn btn-light comment-reply-cancel" @click="showInputBoxSubCommentIndex = null">취소</button>
@@ -197,7 +197,7 @@ export default {
       if (this.subCommentInfoWrap[rootCommentId] !== undefined) {
         if (this.showSubCommentIdBundleList.includes(rootCommentId)) {
           this.showSubCommentIdBundleList = this.showSubCommentIdBundleList.filter((commentId) => {
-            commentId !== rootCommentId
+            return commentId !== rootCommentId
           })
         } else {
           this.showSubCommentIdBundleList.push(rootCommentId)
@@ -241,14 +241,11 @@ export default {
     deleteComment: function (commentInfo) {
       this.deleteCommentInfo = commentInfo
     },
-    autoHeightTextarea: function () {
-      let commentTextarea = $('.comment-textarea');
+    autoHeightTextarea: function (e) {
+      let commentTextarea = $(e.target)
+      commentTextarea[0].style.height = 'auto'
       let scrollHeight = commentTextarea.prop('scrollHeight');
-      let innerHeight = commentTextarea.innerHeight()
-      
-      if (scrollHeight > innerHeight) {
-        commentTextarea.css('height', scrollHeight)
-      }
+      commentTextarea.css('height', scrollHeight)
     },
     getCommentDate: function (timestamp) {
       let dateInfo = this.convertDateToTimestamp(timestamp)
@@ -474,7 +471,7 @@ export default {
   .comment-hand-thumbs-up-wrap {
     display: inline-block;
     cursor: pointer;
-    width: 60px;
+    width: 74px;
     .comment-hand-thumbs {
       margin-right: 8px;
       width: 16px;
@@ -494,7 +491,11 @@ export default {
     vertical-align: bottom;
   }
   .comment-reply-textarea {
+    overflow-y: hidden;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
     margin-top: 15px;
+    height: 36px;
   }
   .comment-reply-button-wrap {
     text-align: left;
@@ -510,17 +511,11 @@ export default {
   }
   .subcomment-wrap {
     margin-top: 20px;
-    margin-left: 60px;
     .subcomment-detail-wrap {
       padding: 10px 20px;
-      background-color: #eeeeee;
+      background-color: #f4f4f4;
       border-radius: 10px;
       margin-top: 10px;
-    }
-  }
-  @media (max-width: 768px) {
-    .subcomment-wrap {
-      margin-left: 0;
     }
   }
 }
@@ -577,8 +572,8 @@ export default {
 .comment-textarea {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+  height: 60px;
   width: calc(100% - 80px);
-  height: 62px;
 }
 .comment-textarea::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera*/
@@ -586,7 +581,7 @@ export default {
 .comment-regist-button {
   width: 70px;
   margin-left: 10px;
-  height: 62px;
+  height: 60px;
 }
 hr {
   margin: 20px 0;

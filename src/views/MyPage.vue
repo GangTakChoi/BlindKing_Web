@@ -39,10 +39,18 @@
             <span style="opacity:0.6">[{{ boardInfo.commentCount }}]</span>
           </span>
           <span class="row-detail">
-            {{ getDate(boardInfo.createdAt) }} • 
-            조회수 {{ boardInfo.view }} • 
-            좋아요 {{ boardInfo.like }} • 
-            싫어요 {{ boardInfo.dislike }}
+            <span>
+              <img class="view-icon" src="@/assets/img/eye.svg" alt="view"> {{ boardInfo.view.toLocaleString('ko-KR') }}
+            </span>
+            <span>
+              <img class="hand-thumbs" src="@/assets/img/hand-thumbs-up.svg"> {{ boardInfo.like.toLocaleString('ko-KR') }}
+            </span>
+            <span>
+              <img class="hand-thumbs" src="@/assets/img/hand-thumbs-down.svg"> {{ boardInfo.dislike.toLocaleString('ko-KR') }}
+            </span>
+            <span>
+               • {{ getDate(boardInfo.createdAt) }} 
+            </span>
           </span>
         </div>
 
@@ -86,8 +94,12 @@
             {{ commentInfo.content }}
           </span>
           <span class="row-detail">
-            {{ getDate(commentInfo.createdAt) }} • 
-            좋아요 {{ commentInfo.like }}
+            <span>
+              <img class="hand-thumbs" src="@/assets/img/hand-thumbs-up.svg"> {{ commentInfo.like.toLocaleString('ko-KR') }}
+            </span>
+            <span>
+               • {{ getDate(commentInfo.createdAt) }}
+            </span>
           </span>
           <span class="row-detail">
             <router-link :to="'/community/detail/' + commentInfo.boardId._id">
@@ -246,7 +258,7 @@ export default {
   width: 120px;
 }
 .board-order-select {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 .comment-order-select {
   margin-bottom: 14px;
@@ -255,16 +267,23 @@ export default {
   word-break: break-all;
   display: block;
   width: 100%;
-  font-size: 18px;
+  font-size: 16px;
+  margin-bottom: 3px;
 }
 .row-detail {
   word-break: break-all;
   display: block;
   font-size: 14px;
-  opacity: 0.6;
+  img {
+    width: 18px;
+    margin-right: 1px;
+  }
+  span:not(:last-child) {
+    margin-right: 3px;
+  }
 }
 .row-detail:not(:last-child) {
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .row-comment-content {
   display: block;

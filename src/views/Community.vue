@@ -1,9 +1,33 @@
 <template>
   <div class="content-container">
-    <div class="button-wrap">
-      <button class="btn btn-primary" @click="moveWritePage">글쓰기</button>
+    <div class="top-wrap">
+      <div class="refresh-box shadow" @click="loadData(false)">
+        <!-- <img src="@/assets/img/arrow-counterclockwise.svg" alt=""> -->
+      </div>
+      <button class="btn btn-primary shadow-sm" @click="moveWritePage">글쓰기</button>
     </div>
-    <table class="table shadow-sm">
+    <div class="board-list-wrap shadow-sm">
+      <div v-for="(boardInfo, key) in boardList" :key="key" @click="moveBoardView(boardInfo.Objectid)" class="board-list-row">
+        <div class="board-title"> {{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></div>
+        <div class="board-detail-info">
+          <span class="view"><img class="view-icon" src="@/assets/img/eye.svg" alt="view"> {{ convertNumberUnit(boardInfo.view) }}</span>
+          <span class="like"><img class="like-icon" src="@/assets/img/heart.svg" alt="like"> {{ convertNumberUnit(boardInfo.like) }}</span>
+          <span class="nickname">{{ boardInfo.nickname }}</span>
+          <span class="date">{{ getCreatedDate(boardInfo.createdAt) }}</span>
+        </div>
+      </div>
+      <div v-if="boardList.length === 0 && isResponseComplete">
+        등록된 글이 없습니다.
+      </div>
+      <div v-if="!isResponseComplete">
+        <div class="d-flex justify-content-center" style="margin: 40px 0">
+          <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <table class="table shadow-sm"> -->
       <!-- <thead class="thead-dark">
         <tr>
           <th scope="col" class="title">제목</th>
@@ -13,7 +37,7 @@
           <th scope="col" class="like">추천수</th>
         </tr>
       </thead> -->
-      <tbody>
+      <!-- <tbody>
         <tr v-for="(boardInfo, key) in boardList" :key="key" @click="moveBoardView(boardInfo.Objectid)">
           <td scope="row">{{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></td>
           <td>{{ boardInfo.nickname }}</td>
@@ -34,7 +58,7 @@
           </td>
         </tr>
       </tbody>
-    </table>
+    </table> -->
     
     <div v-if="isResponseComplete" class="input-group">
       <div class="input-group-prepend">
@@ -152,6 +176,9 @@ export default {
         requestUrl = '/community/board-list?page=' + this.currentPage + '&countPerPage=' + COUNT_PER_PAGE
       }
 
+      this.boardList = []
+      this.isResponseComplete = false
+
       this.$http.get(requestUrl)
       .then((response) => {
         this.isResponseComplete = true
@@ -206,49 +233,113 @@ export default {
   background-color: #fff;
   margin-bottom: 20px;
 }
-.button-wrap {
+.top-wrap {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  .refresh-box {
+    background: center no-repeat url("../assets/img/arrow-counterclockwise.svg");
+    background-size: 26px;
+    background-color: #ffffff;
+    border: 0;
+    border-radius: 10px;
+    padding: 19px;
+  }
+  .refresh-box:hover {
+    background-color: #f4f4f4;
+  }
   width: 100%;
   text-align: right;
 }
-.table {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  thead {
-    font-size: 14px;
-    text-align: center;
+.board-list-wrap {
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  margin: 20px 0;
+  .board-list-row {
+    padding: 6px;
   }
-  th {
-    border-top: 0;
-    font-size: 13px;
-  }
-  td {
-    border-top: 0;
-  }
-  td:not(:first-child) {
-    font-size: 16px;
-  }
-  .title {
-    width: auto;
+  .board-list-row:hover {
+    cursor: pointer;
+    border-radius: 10px;
+    background-color: #f4f4f4;
   }
   .comment-count {
     display: inline-block;
     margin-left: 5px;
     color: #a5a5a5;
   }
-  .views, .like, .nickname, .created {
-    width: 63px;
-  }
-  td:not(:first-child) {
-    text-align: center;
-  }
-  tbody tr {
-    background-color: white;
-  }
-  tbody tr:hover {
-    cursor: pointer;
-    background-color: rgb(248, 248, 248);
+  .board-detail-info {
+    color: #535353;
+    margin-top: 1px;
+    span:not(:last-child) {
+      margin-right: 10px;
+    }
+    .like {
+      .like-icon {
+        width: 14px;
+        margin-right: 5px;
+      }
+    }
+    .view {
+      .view-icon {
+        width: 16px;
+        margin-right: 5px;
+      }
+    }
+    .date {
+
+    }
+    .nickname {
+
+    }
   }
 }
+@media (max-width: 768px) {
+  .board-list-wrap {
+    padding: 5px;
+  }
+}
+// .table {
+//   margin-top: 20px;
+//   margin-bottom: 20px;
+//   thead {
+//     font-size: 14px;
+//     text-align: center;
+//   }
+//   th {
+//     border-top: 0;
+//     font-size: 13px;
+//   }
+//   td {
+//     border-top: 0;
+//   }
+//   td:not(:first-child) {
+//     font-size: 16px;
+//   }
+//   .title {
+//     width: auto;
+//   }
+//   .comment-count {
+//     display: inline-block;
+//     margin-left: 5px;
+//     color: #a5a5a5;
+//   }
+//   .views, .like, .nickname, .created {
+//     width: 63px;
+//   }
+//   td:not(:first-child) {
+//     text-align: center;
+//   }
+//   tbody tr {
+//     background-color: white;
+//   }
+//   tbody tr:hover {
+//     cursor: pointer;
+//     background-color: rgb(248, 248, 248);
+//   }
+// }
+
 .pagination {
   justify-content: center;
 }
