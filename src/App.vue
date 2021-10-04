@@ -126,20 +126,9 @@ export default {
 </script>
 
 <style lang="scss">
-@import "./assets/css/common.css";
 @import "./assets/bootstrap-4.6.0/css/bootstrap.min.css";
+@import "./assets/css/common.css";
 @import "./assets/css/ckeditor5.css";
-
-body {
-  background: #eeeef1;
-  font-size: 16px;
-}
-
-@media (max-width: 768px) {
-  body {
-    font-size: 16px;
-  }
-}
 
 #nav {
   background-color: #fff;

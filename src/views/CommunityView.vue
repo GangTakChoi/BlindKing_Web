@@ -606,8 +606,7 @@ hr {
   position: relative;
   top: -14px;
   float: right;
-  color: #b4b4b4;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .nickname {

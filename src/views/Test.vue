@@ -2,7 +2,14 @@
   <div class="content-container">
     <div>
       <form>
-        <button class="btn btn-primary" type="submit" @click="test">test</button>
+        <div class="test-img">
+          
+        </div>
+        <div class="form-row">
+          <input type="text" class="form-control" id="exampleInputPassword1" v-model="testNumber">
+          <button class="btn btn-primary" type="submit" @click="convertNumberUnit(testNumber)">test</button>
+        </div>
+        <br><br>
         <div class="form-row">
           <div class="col-md-6 mb-3">
             
@@ -143,6 +150,7 @@ export default {
   name: 'Test',
   data : () => {
     return {
+      testNumber: 0,
       id : '',
       pw : '' ,
       userList : [],
@@ -237,6 +245,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.test-img {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #000;
+  background: center no-repeat url("../assets/img/arrow-counterclockwise.svg");
+}
 .btn-primary {
   margin-top: 20px;
   margin-right: 10px;

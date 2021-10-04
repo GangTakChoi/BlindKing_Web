@@ -53,7 +53,21 @@ let commonMixin = {
       returnData.minutes = this.fillZero(toConvertDate.getMinutes())
 
       return returnData
-    }
+    },
+    getIsHistoryBack: function () {
+      let today = new Date()
+      let nowTimestamp = today.getTime()
+      let backTimestamp = Number(localStorage.getItem("뒤로가기발생시간"))
+      let savedData = localStorage.getItem(this.$route.name)
+
+      return ( nowTimestamp - backTimestamp ) <= 100 && savedData !== null
+    },
+    getCache: function () {
+      return localStorage.getItem(this.$route.name)
+    },
+    saveCache: function (data) {
+      localStorage.setItem(this.$route.name, JSON.stringify(data));
+    },
   },
 }
 

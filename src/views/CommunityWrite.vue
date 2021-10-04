@@ -1,6 +1,9 @@
 <template>
   <div class="content-container">
     <form @submit.prevent="submit">
+      <select class="form-control category-select" id="exampleFormControlSelect1" v-model="selectCategoryId">
+        <option v-for="(categoryInfo, index) in categoryList" :key="index" :value="categoryInfo._id">{{categoryInfo.name}}</option>
+      </select>
       <div class="title-input-wrap shadow-sm">
         <input type="text" class="title-input" v-model="title">
       </div>
@@ -24,6 +27,8 @@ export default {
   name: "CommunityWrite",
   data: () => {
     return {
+      selectCategoryId: null,
+      categoryList: [],
       isRegistBoardLoading: false,
       title: '',
       editor: ClassicEditor,
@@ -87,10 +92,15 @@ export default {
         alert('제목은 100자 이내로 가능합니다.')
         return
       }
+      if (!this.selectCategoryId) {
+        alert('카테고리를 선택해주세요.')
+        return
+      }
 
       let sendData = {
         title: this.title,
         content: this.editorData,
+        categoryId: this.selectCategoryId,
       }
 
       this.isRegistBoardLoading = true
@@ -98,7 +108,7 @@ export default {
       this.$http.post('/community/board', sendData)
       .then((response) => {
         alert('등록 완료되었습니다.')
-        this.$router.push('/community');
+        this.$router.push(`/community?categoryId=${this.selectCategoryId}`);
       })
       .catch((err) => {
         alert('게시글 등록 중 오류가 발생하였습니다.')
@@ -109,6 +119,14 @@ export default {
       })
     },
   },
+  created () {
+    if (this.$route.query.categoryType === 'admin') {
+      this.categoryList = JSON.parse(localStorage.getItem('adminCategoryList'))
+    } else {
+      this.categoryList = JSON.parse(localStorage.getItem('categoryList'))
+    }
+    this.selectCategoryId = this.$route.query.categoryId
+  },
   components: {
     // Use the <ckeditor> component in this view.
     ckeditor: CKEditor.component
@@ -117,6 +135,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.category-select {
+  margin-bottom: 20px;
+}
 .spinner-border-sm {
   margin-right: 5px;
   margin-bottom: 4px;
@@ -126,7 +147,7 @@ export default {
   background-color: white;
   width: 100%;
   height: 50px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   border-radius: 10px;
 }
 .title-input-wrap:hover {

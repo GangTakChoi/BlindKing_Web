@@ -48,7 +48,7 @@ export default {
       let reqBody = {
         id : this.inputId,
         pw : this.inputPw
-      } 
+      }
       this.$http.post('/user/login', reqBody).then((response) => {
         if (response.status === 201) {
           alert('로그인 성공')

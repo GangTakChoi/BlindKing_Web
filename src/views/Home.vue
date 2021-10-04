@@ -54,11 +54,11 @@
         </button>
       </a>
       <!-- </router-link> -->
-      <!-- <router-link to="/test">
+      <router-link to="/test">
         <button class="basic-button-design shadow-sm rounded">
           test
         </button>
-      </router-link> -->
+      </router-link>
     </div>
     <div v-else>
       <div class="jumbotron jumbotron-fluid rounded">

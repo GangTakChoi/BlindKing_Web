@@ -1,5 +1,16 @@
 /*! 공통 스타일 선언 */
 
+body {
+  background: #eeeef1;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+}
+
 .main-container {
   position: relative;
   width: 100%;

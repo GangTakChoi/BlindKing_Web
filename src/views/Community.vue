@@ -1,14 +1,36 @@
 <template>
   <div class="content-container">
+    <div class="category-wrap">
+      <ul>
+        <li v-for="(categoryInfo, index) in adminCategoryList" :key="index" 
+        @click="changeCategory(categoryInfo._id)"
+        :class="{ 'seleted': categoryInfo._id === selectCategoryId }" class="category-button shadow-sm notice" id="category-button">
+          {{ categoryInfo.name }}
+        </li>
+      </ul>
+      <ul>
+        <li v-for="(categoryInfo, index) in categoryList" :key="index" 
+        @click="changeCategory(categoryInfo._id)"
+        :class="{ 'seleted': categoryInfo._id === selectCategoryId }" class="category-button shadow-sm" id="category-button">
+          {{ categoryInfo.name }}
+        </li>
+      </ul>
+      <ul v-if="isAdmin">
+        <li class="category-button shadow-sm" data-toggle="modal" data-target="#addCategory">
+          <img class="category-plus-img" src="@/assets/img/plus-lg.svg" alt=""> 추가
+        </li>
+        <li class="category-button shadow-sm" style="padding:4px 8px" data-toggle="modal" data-target="#settomgCategory">
+          <img width="20px" class="category-plus-img" src="@/assets/img/gear.svg" alt="">
+        </li>
+      </ul>
+    </div>
     <div class="top-wrap">
-      <div class="refresh-box shadow" @click="loadData(false)">
-        <!-- <img src="@/assets/img/arrow-counterclockwise.svg" alt=""> -->
-      </div>
-      <button class="btn btn-primary shadow-sm" @click="moveWritePage">글쓰기</button>
+      <div class="refresh-box shadow" @click="loadBoardData(false)"></div>
+      <button v-if="isShowWriteButton" class="btn btn-dark shadow" @click="moveWritePage">글쓰기</button>
     </div>
     <div class="board-list-wrap shadow-sm">
       <div v-for="(boardInfo, key) in boardList" :key="key" @click="moveBoardView(boardInfo.Objectid)" class="board-list-row">
-        <div class="board-title"> {{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></div>
+        <div class="board-title btn-link"> {{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></div>
         <div class="board-detail-info">
           <span class="view"><img class="view-icon" src="@/assets/img/eye.svg" alt="view"> {{ convertNumberUnit(boardInfo.view) }}</span>
           <span class="like"><img class="like-icon" src="@/assets/img/heart.svg" alt="like"> {{ convertNumberUnit(boardInfo.like) }}</span>
@@ -27,38 +49,6 @@
         </div>
       </div>
     </div>
-    <!-- <table class="table shadow-sm"> -->
-      <!-- <thead class="thead-dark">
-        <tr>
-          <th scope="col" class="title">제목</th>
-          <th scope="col" class="nickname">작성자</th>
-          <th scope="col" class="created">작성일</th>
-          <th scope="col" class="views">조회수</th>
-          <th scope="col" class="like">추천수</th>
-        </tr>
-      </thead> -->
-      <!-- <tbody>
-        <tr v-for="(boardInfo, key) in boardList" :key="key" @click="moveBoardView(boardInfo.Objectid)">
-          <td scope="row">{{ boardInfo.title }} <span class="comment-count">{{'[' + boardInfo.commentCount + ']'}}</span></td>
-          <td>{{ boardInfo.nickname }}</td>
-          <td>{{ getCreatedDate(boardInfo.createdAt) }}</td>
-          <td>{{ boardInfo.view.toLocaleString('ko-KR') }}</td>
-          <td>{{ boardInfo.like }}</td>
-        </tr>
-        <tr v-if="boardList.length === 0 && isResponseComplete">
-          <td colspan="5" scope="row" style="text-align:center"> 등록된 글이 없습니다.</td>
-        </tr>
-        <tr v-if="!isResponseComplete">
-          <td colspan="5" >
-            <div class="d-flex justify-content-center" style="margin: 40px 0">
-              <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
-                <span class="sr-only">Loading...</span>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table> -->
     
     <div v-if="isResponseComplete" class="input-group">
       <div class="input-group-prepend">
@@ -93,30 +83,72 @@
         </li>
       </ul>
     </nav>
+    <AddCategoryModel @updateCategory="loadCategory"/>
+    <SettingCategory ref="SettingCategory" :categoryList="categoryList" :adminCategoryList="adminCategoryList" @updateCategory="loadCategory"/>
   </div>
 </template>
 
 <script>
-const PAGE_COUNT = 10;
-const COUNT_PER_PAGE = 15;
+import VueCookies from 'vue-cookies'
+import AddCategoryModel from '@/components/AddCategoryModel.vue'
+import SettingCategory from '@/components/SettingCategory.vue'
+
+const PAGE_COUNT = 5;
+const COUNT_PER_PAGE = 10 ;
 
 export default {
   name: "Community",
+  components: { AddCategoryModel, SettingCategory },
   data: () => {
     return {
       boardList: [],
+      categoryList: [],
+      adminCategoryList: [],
+      selectCategoryId: null,
       isResponseComplete: false,
       currentPage: 1,
       pageNumberList: [],
-      pageNumberCount: 10,
       minPage: 1,
       maxPage: PAGE_COUNT,
       isNextPageButtonActive: false,
       searchOption: '선택',
       searchContent: '',
+      isAdmin: false,
     }
   },
+  computed: {
+    isShowWriteButton: function () {
+      if (this.isAdmin) {
+        return true
+      }
+
+      let result = this.adminCategoryList.find((categoryInfo) => {
+        if (categoryInfo._id === this.selectCategoryId) return true
+      })
+
+      return result === undefined ? true : false
+    },
+  },
   methods: {
+    getCategoryType: function (categoryId) {
+      let result = this.adminCategoryList.find((categoryInfo) => {
+        if (categoryInfo._id === categoryId) return true
+      })
+
+      if (result !== undefined) {
+        return result.type
+      }
+
+      result = this.categoryList.find((categoryInfo) => {
+        if (categoryInfo._id === categoryId) return true
+      })
+
+      if (result !== undefined) {
+        return result.type
+      }
+
+      return 'normal'
+    },
     searchBoard: function () {
       if (this.searchOption === '선택') {
         alert('옵션을 선택해주세요.')
@@ -131,7 +163,7 @@ export default {
         return
       }
 
-      this.loadData(true)
+      this.loadBoardData(true)
     },
     selectSearchOption: function (option) {
       this.searchOption = option
@@ -146,7 +178,8 @@ export default {
       }
     },
     moveWritePage: function () {
-      this.$router.push('/community-write');
+      let categoryType = this.getCategoryType(this.selectCategoryId)
+      this.$router.push(`/community-write?categoryId=${this.selectCategoryId}&categoryType=${categoryType}`);
     },
     moveBoardView: function (boardId) {
       this.$router.push('/community/detail/' + boardId);
@@ -155,9 +188,21 @@ export default {
       this.isResponseComplete = false
       this.currentPage = pageNumber
       this.boardList = []
-      this.loadData()
+      this.loadBoardData()
     },
-    loadData: function (isSearch) {
+    changeCategory: function (categoryId) {
+      this.selectCategoryId = categoryId
+      this.initData()
+      this.loadBoardData()
+    },
+    initData: function () {
+      this.minPage = 1
+      this.maxPage = PAGE_COUNT
+      this.isNextPageButtonActive = false
+      this.pageNumberList = []
+      this.currentPage = 1
+    },
+    loadBoardData: function (isSearch) {
       let requestUrl
 
       if (isSearch) {
@@ -176,19 +221,25 @@ export default {
         requestUrl = '/community/board-list?page=' + this.currentPage + '&countPerPage=' + COUNT_PER_PAGE
       }
 
+      if (this.selectCategoryId !== null) {
+        requestUrl += `&categoryId=${this.selectCategoryId}`
+      }
+
       this.boardList = []
       this.isResponseComplete = false
 
       this.$http.get(requestUrl)
       .then((response) => {
+        this.selectCategoryId = response.data.categoryId
         this.isResponseComplete = true
         this.boardList = response.data.boardList
         let lastPageNumber = response.data.lastPageNumber
 
-        
         if (this.maxPage >= lastPageNumber) {
           this.maxPage = lastPageNumber
           this.isNextPageButtonActive = false
+        } else {
+          this.isNextPageButtonActive = true
         }
 
         this.loadPaginationNumber()
@@ -202,7 +253,7 @@ export default {
       if (this.minPage === 1) return
 
       this.minPage -= PAGE_COUNT;
-      this.maxPage -= PAGE_COUNT;
+      this.maxPage = this.minPage + (PAGE_COUNT - 1);
 
       this.movePage(this.maxPage)
     },
@@ -216,14 +267,42 @@ export default {
     },
     loadPaginationNumber: function () {
       this.pageNumberList = []
-
       for (var i=this.minPage; i<=this.maxPage; i++) {
         this.pageNumberList.push(i)
       }
     },
+    loadCategory: function () {
+      this.$http.get('/community/category')
+      .then((response) => {
+        this.categoryList = response.data.normalCategory
+        this.adminCategoryList = response.data.adminCategory
+        localStorage.setItem("categoryList", JSON.stringify(this.categoryList))
+        localStorage.setItem("adminCategoryList", JSON.stringify(this.adminCategoryList))
+        this.$refs.SettingCategory.initData()
+      })
+      .catch ((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+    },
   },
   async created () {
-    await this.loadData()
+    if ( this.getIsHistoryBack() ) {
+      Object.assign(this.$data, JSON.parse(this.getCache()))
+      this.isResponseComplete = true
+    } else {
+      if (this.$route.query.categoryId !== undefined) {
+        this.selectCategoryId = this.$route.query.categoryId
+      }
+      this.loadCategory()
+      this.loadBoardData()
+    }
+    
+    this.isAdmin = VueCookies.get('roleName') === 'admin' ? true : false
+  },
+  beforeRouteLeave (to, from, next) {
+    this.saveCache(this.$data)
+    next()
   }
 }
 </script>
@@ -233,11 +312,45 @@ export default {
   background-color: #fff;
   margin-bottom: 20px;
 }
+.category-wrap {
+  margin-bottom: 10px;
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+  .category-plus-img {
+    position: relative;
+    top: -2px;
+    margin-right: 2px;
+  }
+  .category-button {
+    cursor: pointer;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border: 2px solid #ffffff;
+    text-align: center;
+  }
+  .category-button:hover {
+    background-color: #f4f4f4;
+  }
+  .seleted {
+    border: 2px solid #000000;
+    background-color: #ffffff;
+    color: #000000;
+  }
+  .notice {
+    color: #ff6b6b;
+  }
+}
 .top-wrap {
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   .refresh-box {
+    cursor: pointer;
     background: center no-repeat url("../assets/img/arrow-counterclockwise.svg");
     background-size: 26px;
     background-color: #ffffff;
