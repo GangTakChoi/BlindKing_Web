@@ -1,9 +1,10 @@
 <template>
   <div class="content-container">
     
-    <div v-if="isResponseComplete && isMyBoard" class="board-controller-wrap">
-      <button class="shadow-sm" @click="moveModifyPage">글수정</button>
-      <button class="shadow-sm" @click="deleteBoard">글삭제</button>
+    <div v-if="isResponseComplete" class="board-controller-wrap">
+      <button v-if="isMyBoard" class="shadow-sm" @click="moveModifyPage">글수정</button>
+      <button v-if="isMyBoard || isAdmin" class="shadow-sm" @click="deleteBoard">글삭제</button>
+      <button v-if="!isMyBoard && !isAdminBoard" class="shadow-sm" data-toggle="modal" data-target="#reportUserModal">신고</button>
     </div>
     <div class="board-view-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
@@ -11,7 +12,6 @@
           <span class="sr-only">Loading...</span>
         </div>
       </div>
-
       
       <div v-if="isResponseComplete">
         <div class="title">
@@ -121,7 +121,7 @@
         </div>
       </template>
       <!-- </div> -->
-
+      <ReportUserModal :boardId="$route.params.boardId" :target="'게시글'"/>
       <CommentDeleteModal :commentInfo="deleteCommentInfo" :boardId="$route.params.boardId" @commentDeleteComplete="commentDeleteComplete" />
     </div>
   </div>
@@ -129,14 +129,16 @@
 
 <script>
 import CommentDeleteModal from '@/components/CommentDeleteModal.vue'
+import ReportUserModal from '@/components/ReportUserModal.vue'
 import $ from 'jquery'
 
 export default {
   name: "CommunityView",
-  components: { CommentDeleteModal },
+  components: { CommentDeleteModal, ReportUserModal },
   data: () => {
     return {
       isMyBoard: false,
+      isAdminBoard: false,
       title: '',
       content: '',
       nickname: '',
@@ -405,6 +407,7 @@ export default {
         this.view = responseData.view.toLocaleString('ko-KR')
         this.like = responseData.like
         this.dislike = responseData.dislike
+        this.isAdminBoard = responseData.categoryType === 'admin' ? true : false
 
         let dateInfo = this.convertDateToTimestamp(responseData.createdAt)
         this.createdDate = dateInfo.year + '/' + dateInfo.month + '/' + dateInfo.day + ' ' + dateInfo.hours + ':' + dateInfo.minutes
@@ -586,35 +589,33 @@ export default {
 hr {
   margin: 20px 0;
 }
-.title {
-  width: 100%;
-  word-break: break-all;
-  // font-weight: bold;
-  font-size: 1.8rem;
-  text-align: center;
-  // margin-bottom: 20px;
-}
+
 .board-view-wrap {
   width: 100%;
   background-color: #fff;
   min-height: 100px;
   border-radius: 5px;
   padding: 20px;
-}
-
-.add-info-section {
-  position: relative;
-  top: -14px;
-  float: right;
-  font-size: 1rem;
-}
-
-.nickname {
-  cursor: pointer;
-}
-
-.content {
-  margin-top: 70px;
+  .title {
+    width: 100%;
+    word-break: break-all;
+    // font-weight: bold;
+    font-size: 1.8rem;
+    text-align: center;
+    // margin-bottom: 20px;
+  }
+  .add-info-section {
+    position: relative;
+    top: -14px;
+    float: right;
+    font-size: 1rem;
+  }
+  .content {
+    margin-top: 70px;
+  }
+  .nickname {
+    cursor: pointer;
+  }
 }
 
 .hand-thumbs-wrap {

@@ -113,7 +113,6 @@ export default {
       isNextPageButtonActive: false,
       searchOption: '선택',
       searchContent: '',
-      isAdmin: false,
     }
   },
   computed: {
@@ -244,9 +243,9 @@ export default {
 
         this.loadPaginationNumber()
       })
-      .catch((err) => {
-        console.log(err)
-        alert('에러발생')
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
       })
     },
     previousPagination: function () {
@@ -297,8 +296,6 @@ export default {
       this.loadCategory()
       this.loadBoardData()
     }
-    
-    this.isAdmin = VueCookies.get('roleName') === 'admin' ? true : false
   },
   beforeRouteLeave (to, from, next) {
     this.saveCache(this.$data)

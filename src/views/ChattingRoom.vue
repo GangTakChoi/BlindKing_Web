@@ -3,10 +3,11 @@
     <div class="chatting-room-frame shadow">
       <div class="chatting-headline">
         {{ $route.query.nickname }}
+        <button class="btn btn-warning report-button" data-toggle="modal" data-target="#reportUserModal">신고</button>
       </div>
       <div id="chatting-message-display">
         <div v-for="(msgInfo, key) in messageList" :key="key" 
-          class="sppech-bubble-frame shadow" 
+          class="sppech-bubble-frame shadow-sm" 
           :class="{ 
             'female-sppech-bubble' : msgInfo.gender === 'female',
             'male-sppech-bubble': msgInfo.gender === 'male',
@@ -30,17 +31,21 @@
         <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
       </svg>
     </div>
+
+    <ReportUserModal :friendId="$route.params.friendObjectId" :target="'채팅'"/>
   </div>
 </template>
 
 <script>
 import io from '@/assets/js/socket.io.js'
+import ReportUserModal from '@/components/ReportUserModal.vue'
 import VueCookies from 'vue-cookies'
 
 const TOKEN = VueCookies.get('token');
 
 export default {
   name: "ChattingRoom",
+  components: { ReportUserModal },
   data: () => {
     return {
       messageList: [],
@@ -139,12 +144,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.report-button {
+  position: absolute;
+  top: 11px;
+  right: 9px;
+  padding: 3px 6px;
+  font-size: 14px;
+}
 #chatting-message-display {
   width: 100%;
   overflow-x:hidden; 
   overflow-y:auto;
-  height: 650px;
-  font-size: 18px;
+  height: 520px;
+  font-size: 16px;
   padding: 20px 30px;
   border: 0px solid #cfcfcf;
   border-radius: 5px;
@@ -153,7 +165,7 @@ export default {
 .chatting-room-frame {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 490px;
   margin: auto;
   background-color: #fff;
   padding: 0 0 125px 0;
@@ -162,7 +174,7 @@ export default {
 }
 
 .sppech-bubble-frame {
-  padding: 10px 16px;
+  padding: 8px 16px;
   width: fit-content;
   border-radius: 5px;
   word-break: break-all;
@@ -171,7 +183,7 @@ export default {
   transition-duration: 1s;
 }
 .sppech-bubble-frame:not(:first-child) {
-  margin-top: 40px;
+  margin-top: 30px;
 }
 .male-sppech-bubble {
   background-color: #f3f3fd;
@@ -206,12 +218,13 @@ export default {
   height: 100%;
 }
 .chatting-headline {
+  position: relative;
   background-color: #ffffff;
   width: 100%;
   height: 50px;
   font-size: 18px;
   text-align: center;
-  padding: 12px;
+  padding: 11px;
 }
 .text-muted {
   position:absolute;

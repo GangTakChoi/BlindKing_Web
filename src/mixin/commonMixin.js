@@ -1,4 +1,11 @@
+import VueCookies from 'vue-cookies'
+
 let commonMixin = {
+  data () {
+    return {
+      isAdmin: false,
+    }
+  },
   methods: {
     fillZero: function (num) {
       if (num < 10) {
@@ -68,6 +75,9 @@ let commonMixin = {
     saveCache: function (data) {
       localStorage.setItem(this.$route.name, JSON.stringify(data));
     },
+  },
+  created () {
+    this.isAdmin = VueCookies.get('roleName') === 'admin' ? true : false
   },
 }
 
