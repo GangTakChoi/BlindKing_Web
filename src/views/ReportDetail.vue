@@ -31,6 +31,45 @@
       </tbody>
     </table>
 
+    <button v-if="reportInfo.target === '댓글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
+    @click="isShowCaptureComment = !isShowCaptureComment">신고 대상 댓글 내용보기</button>
+    <div v-if="isShowCaptureComment" class="comment-section shadow">
+      <div class="comment-wrap">
+        <div class="comment-nickname">
+          {{ reportInfo.captureTargetContent.nickname }}
+        </div>
+        <div class="comment-created-date">
+          {{ getDate(reportInfo.captureTargetContent.createdAt) }}
+        </div>
+        <div class="comment-content">
+          {{ reportInfo.captureTargetContent.content }}
+        </div>
+      </div>
+    </div>
+    <button v-if="reportInfo.target === '댓글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
+    @click="loadingCommentList(reportInfo.captureTargetContent.writerUserId, reportInfo.captureTargetContent.boardId)">해당 게시글에 작성한 댓글 모두 보기 (삭제포함)</button>
+    <div v-if="isShowCommentList" class="comment-section shadow">
+      <div v-for="(commentInfo, index) in commentList" class="comment-wrap" :key="index">
+        <div class="comment-nickname">
+          {{ commentInfo.nickname }}
+        </div>
+        <div class="comment-created-date">
+          {{ getDate(commentInfo.createdAt) }}
+        </div>
+        <div v-if="commentInfo.rootCommentId !== null" class="comment-rootcomment-status">
+          대댓글
+        </div>
+        <div v-if="commentInfo.isDelete" class="comment-delete-status">
+         삭제된 댓글
+        </div>
+        <div class="comment-content">
+          {{ commentInfo.content }}
+        </div>
+      </div>
+    </div>
+    <button v-if="reportInfo.target === '댓글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
+    @click="moveBoard(reportInfo.captureTargetContent.boardId)">해당 게시글 이동</button>
+
     <button v-if="reportInfo.target === '채팅'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
     @click="loadChattingContent">채팅 내용 보기</button>
     <div v-if="chattingList.length > 0" class="chatting-display-panel">
@@ -40,7 +79,7 @@
     </div>
 
     <button v-if="reportInfo.target === '게시글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
-    @click="moveBoard">게시글 이동</button>
+    @click="moveBoard(reportInfo.captureTargetContent._id)">게시글 이동</button>
     <button v-if="reportInfo.target === '게시글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
     @click="isShowCaptureBoard = !isShowCaptureBoard">게시글 캡처 내용보기</button>
     <div v-if="isShowCaptureBoard" class="capture-board-display-panel shadow">
@@ -65,9 +104,12 @@ export default {
   name: 'ReportDetail',
   data () {
     return {
+      isShowCaptureComment: false,
+      isShowCommentList: false,
       isShowCaptureBoard: false,
       reportInfo: Object,
       chattingList: [],
+      commentList: [],
     }
   },
   methods: {
@@ -76,9 +118,22 @@ export default {
 
       return `${dateInfo.year}/${dateInfo.month}/${dateInfo.day} ${dateInfo.hours}:${dateInfo.minutes}`
     },
-    moveBoard: function () {
-      let boardId = this.reportInfo.captureTargetContent._id
+    moveBoard: function (boardId) {
       this.$router.push(`/community/detail/${boardId}`)
+    },
+    loadingCommentList: function (userId, boardId) {
+      this.isShowCommentList = !this.isShowCommentList
+
+      if (this.commentList.length > 0) return
+
+      this.$http.get(`/user/${userId}/board/${boardId}/comment-list`)
+      .then((response) => {
+        this.commentList = response.data.commentList
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
     },
     loadChattingContent: function () {
       if (this.chattingList.length > 0) return
@@ -162,6 +217,50 @@ table {
   }
   .nickname {
     cursor: pointer;
+  }
+}
+
+
+.comment-section {
+  background-color: #fff;
+  border-radius: 5px;
+  width: 100%;
+  margin: 30px 0;
+  padding: 10px;
+  .comment-wrap {
+    padding: 10px 5px;
+    .comment-nickname {
+      cursor: pointer;
+      display: inline-block;
+      margin-right: 15px;
+      font-weight: bold;
+    }
+    .comment-created-date {
+      display: inline-block;
+      color: #b4b4b4;
+      margin-right: 15px;
+    }
+    .comment-delete-status {
+      display: inline-block;
+      color: #ffffff;
+      background-color: #fc4c4c;
+      border-radius: 7px;
+      padding: 3px 5px;
+      font-size: 12px;
+    }
+    .comment-rootcomment-status {
+      display: inline-block;
+      color: #ffffff;
+      background-color: #000000;
+      border-radius: 7px;
+      padding: 3px 5px;
+      font-size: 12px;
+    }
+    .comment-content {
+      white-space: pre-line;
+      word-break: break-word;
+      margin-top: 5px;
+    }
   }
 }
 </style>

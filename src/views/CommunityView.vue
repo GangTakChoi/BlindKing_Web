@@ -4,7 +4,7 @@
     <div v-if="isResponseComplete" class="board-controller-wrap">
       <button v-if="isMyBoard" class="shadow-sm" @click="moveModifyPage">글수정</button>
       <button v-if="isMyBoard || isAdmin" class="shadow-sm" @click="deleteBoard">글삭제</button>
-      <button v-if="!isMyBoard && !isAdminBoard" class="shadow-sm" data-toggle="modal" data-target="#reportUserModal">신고</button>
+      <button v-if="!isMyBoard && !isAdminBoard" class="shadow-sm" @click="setReportInfo('게시글')" data-toggle="modal" data-target="#reportUserModal">신고</button>
     </div>
     <div class="board-view-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
@@ -49,20 +49,24 @@
     <div v-if="isResponseComplete" class="comment-section shadow">
       <div v-if="commentInfoList.length === 0 && !isCommentRegistLoading" class="text-center">등록된 댓글이 없습니다.</div>
       <template v-else>
+        <!-- 정렬 순서 -->
         <select class="custom-select" id="inlineFormCustomSelectPref" @change="selectCommentOrder">
           <option selected value="latest">최신순</option>
           <option value="popular">인기순</option>
         </select>
+        <!-- 댓글 등록 로딩 바 -->
         <div v-if="isCommentRegistLoading" class="d-flex justify-content-center m-3">
           <div class="spinner-border" role="status">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
+        <!-- 댓글 리스트 조회 로딩 바 -->
         <div v-if="isCommentDataLoading" class="d-flex justify-content-center m-3">
           <div class="spinner-border" role="status">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
+        <!-- 댓글 정보 -->
         <div v-else class="comment-wrap" v-for="(commentInfo, index) in commentInfoList" :key="index">
           <div class="comment-nickname">
             {{ commentInfo.nickname }}
@@ -70,10 +74,17 @@
           <div class="comment-created-date">
             {{ getCommentDate(commentInfo.createdDate) }}
           </div>
+          
+          <!-- 댓글 삭제 -->
           <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + commentInfo.objectId" type="button" class="close" aria-label="Close" 
           @click="deleteComment(commentInfo)" data-toggle="modal" data-target="#exampleModal">
             <span aria-hidden="true">&times;</span>
           </button>
+          <!-- 댓글 신고 -->
+          <button v-else class="close" data-toggle="modal" data-target="#reportUserModal" @click="setReportInfo('댓글', commentInfo.objectId)">
+            <img class="comment-report-img" src="@/assets/img/exclamation.svg" alt="">
+          </button>
+
           <div class="comment-content">
             {{ commentInfo.content }}
           </div>
@@ -107,10 +118,14 @@
                 <div class="comment-created-date">
                   {{ getCommentDate(subCommentInfo.createdDate) }}
                 </div>
+                
                 <button v-if="subCommentInfo.isMine" 
                 :id="'deleteCommentButton' + subCommentInfo.objectId" type="button" class="close" aria-label="Close" 
                 @click="deleteComment(subCommentInfo)" data-toggle="modal" data-target="#exampleModal">
                   <span aria-hidden="true">&times;</span>
+                </button>
+                <button v-else class="close" data-toggle="modal" data-target="#reportUserModal" @click="setReportInfo('댓글', subCommentInfo.objectId)">
+                  <img class="comment-report-img" src="@/assets/img/exclamation.svg" alt="">
                 </button>
                 <div class="comment-content">
                   {{ subCommentInfo.content }}
@@ -120,8 +135,8 @@
           </div>
         </div>
       </template>
-      <!-- </div> -->
-      <ReportUserModal :boardId="$route.params.boardId" :target="'게시글'"/>
+
+      <ReportUserModal :boardId="$route.params.boardId" :commentId="reportInfo.commentId" :target="reportInfo.target"/>
       <CommentDeleteModal :commentInfo="deleteCommentInfo" :boardId="$route.params.boardId" @commentDeleteComplete="commentDeleteComplete" />
     </div>
   </div>
@@ -137,6 +152,10 @@ export default {
   components: { CommentDeleteModal, ReportUserModal },
   data: () => {
     return {
+      reportInfo: {
+        target: '',
+        commentId: '',
+      },
       isMyBoard: false,
       isAdminBoard: false,
       title: '',
@@ -164,6 +183,13 @@ export default {
     }
   },
   methods: {
+    setReportInfo: function (target, reportTargetId) {
+      this.reportInfo.target = target
+
+      if (target === '댓글') {
+        this.reportInfo.commentId = reportTargetId
+      }
+    },
     selectCommentOrder: function (e) {
       let order = e.target.value
       this.isCommentDataLoading = true
@@ -468,6 +494,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.comment-report-img {
+  position: relative;
+  right: -4px;
+  width: 25px;
+  vertical-align: baseline;
+}
 
 .add-action {
   margin-top: 10px;

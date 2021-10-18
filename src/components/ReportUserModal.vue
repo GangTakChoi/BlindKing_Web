@@ -1,5 +1,6 @@
 <template>
   <div class="modal fade" id="reportUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <button v-show="false" @click="resetData" id="resetButton">reset</button>
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
@@ -43,6 +44,7 @@ export default {
   props: {
     friendId: String,
     boardId: String,
+    commentId: String,
     target: String,
   },
   data: () => {
@@ -52,6 +54,10 @@ export default {
     }
   },
   methods : {
+    resetData: function () {
+      this.reportType = '모욕/비방'
+      this.reportContent = ''
+    },
     reportBoard: function () {
       let postBody= {
         target: this.target,
@@ -86,6 +92,23 @@ export default {
         alert(error.response.data.errorMessage)
       })
     },
+    reportComment: function () {
+      let postBody = {
+        target: this.target,
+        reportType: this.reportType,
+        reportContent: this.reportContent,
+      }
+
+      this.$http.post(`/community/board/${this.boardId}/comment/${this.commentId}/report`, postBody)
+      .then((response) => {
+        alert('신고 접수가 완료되었습니다.\n감사합니다.')
+        $('#close').trigger('click')
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+    },
     reportRoute: function () {
       if (this.reportContent.trim() === '') {
         alert('내용을 입력해주세요.')
@@ -101,9 +124,17 @@ export default {
         this.reportChatting()
       } else if (this.target === '게시글') {
         this.reportBoard()
+      } else if (this.target === '댓글') {
+        this.reportComment()
       }
     }
-  }
+  },
+  mounted () {
+    $('#reportUserModal').on('hide.bs.modal', function (event) {
+      // vue method 직접 호출이 불가능하여 resetButton 클릭 이벤트를 발생시켜 우회하여 resetData 메소드 실행
+      $('#resetButton').trigger('click')
+    })
+  },
 }
 </script>
 
