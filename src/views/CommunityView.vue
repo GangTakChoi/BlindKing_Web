@@ -105,7 +105,7 @@
             <div v-if="showInputBoxSubCommentIndex === index">
               <textarea :ref="`subCommentTextarea-${commentInfo.objectId}`" @keyup="autoHeightTextarea" class="form-control comment-reply-textarea" id="" rows="1" ></textarea>
               <div class="comment-reply-button-wrap">
-                <button type="button" class="btn btn-dark comment-reply-regist" @click="registSubComment(commentInfo.objectId)">등록</button>
+                <button type="button" class="btn btn-dark comment-reply-regist" @click="registSubComment(commentInfo.objectId)" :disabled="!isSubCommentRegistButtonActivity">등록</button>
                 <button type="button" class="btn btn-light comment-reply-cancel" @click="showInputBoxSubCommentIndex = null">취소</button>
               </div>
             </div>
@@ -171,6 +171,7 @@ export default {
       isCommentRegistLoading: false,
       isCommentDataLoading: false,
       isCommentRegistButtonActivity: true,
+      isSubCommentRegistButtonActivity: true,
       deleteCommentInfo: {},
       showInputBoxSubCommentIndex: null,
       showSubCommentIdBundleList: [],
@@ -303,6 +304,8 @@ export default {
         content: content
       }
 
+      this.isSubCommentRegistButtonActivity = false
+
       this.$http.post(`/community/board/${this.$route.params.boardId}/comment/${commentId}/sub-comment`, postBody)
       .then((response) => {
         let registedCommentInfo = response.data.commentInfo
@@ -326,6 +329,9 @@ export default {
       .catch((error) => {
         console.log(error)
         alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.isSubCommentRegistButtonActivity = true
       })
     },
     registComment: function () {

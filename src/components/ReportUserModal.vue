@@ -28,7 +28,7 @@
           </form>
         </div>
         <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-danger" @click="reportRoute">신고</button>
+          <button type="button" class="btn btn-danger" @click="reportRoute" :disabled="isDisabledReportButton">신고</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
         </div>
       </div>
@@ -51,6 +51,7 @@ export default {
     return {
       reportType: '모욕/비방',
       reportContent: '',
+      isDisabledReportButton: false,
     }
   },
   methods : {
@@ -74,6 +75,9 @@ export default {
         console.log(error)
         alert(error.response.data.errorMessage)
       })
+      .finally(() => {
+        this.isDisabledReportButton = false
+      })
     },
     reportChatting: function () {
       let postBody = {
@@ -90,6 +94,9 @@ export default {
       .catch((error) => {
         console.log(error)
         alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.isDisabledReportButton = false
       })
     },
     reportComment: function () {
@@ -108,6 +115,9 @@ export default {
         console.log(error)
         alert(error.response.data.errorMessage)
       })
+      .finally(() => {
+        this.isDisabledReportButton = false
+      })
     },
     reportSelfIntroduction: function () {
       let postBody = {
@@ -125,6 +135,9 @@ export default {
         console.log(error)
         alert(error.response.data.errorMessage)
       })
+      .finally(() => {
+        this.isDisabledReportButton = false
+      })
     },
     reportRoute: function () {
       if (this.reportContent.trim() === '') {
@@ -136,6 +149,8 @@ export default {
         alert('내용은 5000자 이내로 작성 부탁드립니다.')
         return
       }
+
+      this.isDisabledReportButton = true
 
       if (this.target === '채팅') {
         this.reportChatting()

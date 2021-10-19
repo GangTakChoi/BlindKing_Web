@@ -19,8 +19,11 @@
       </div>
       <div class="input-section">
         <small v-if="!$global.isMobile" id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
-        <textarea :disabled="isClose" v-if="!$global.isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent></textarea>
-        <textarea :disabled="isClose" v-else v-model="message" class="form-control" rows="3"></textarea>
+        <textarea :disabled="isClose" v-if="!$global.isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent maxlength="5000">
+        </textarea>
+        <textarea :disabled="isClose" v-else v-model="message" class="form-control" rows="3" maxlength="5000">
+        </textarea>
+        <div class="text-length-info">{{message.length}} / 5000</div>
         <button :disabled="isClose" class="btn btn-primary" @click="sendMessage">전송</button>
       </div>
     </div>
@@ -52,6 +55,7 @@ export default {
       message: "",
       socket: {},
       isClose: false,
+      isAlramSocketDisconnect: true,
     }
   },
   methods: {
@@ -135,8 +139,15 @@ export default {
       var displayDiv = document.getElementById("chatting-message-display")
       displayDiv.scrollTop = displayDiv.scrollHeight
     })
+
+    this.socket.on("disconnect", () => {
+      if (!this.isAlramSocketDisconnect) return
+      
+      alert('상대와의 연결이 끊겼습니다.\n새로고침 또는 대화방을 재입장 해주세요.')
+    });
   },
   beforeRouteLeave (to, from, next) {
+    this.isAlramSocketDisconnect = false
     this.socket.disconnect()
     next()
   },
@@ -284,6 +295,23 @@ export default {
   }
   .form-control {
     position: unset;
+  }
+}
+.text-length-info {
+  -ms-user-select: none; 
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  position: absolute;
+  right: 120px;
+  bottom: 25px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+@media (max-width: 768px) {
+  .text-length-info {
+    right: 88px;
   }
 }
 </style>
