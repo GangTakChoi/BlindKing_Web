@@ -6,7 +6,7 @@
           <th scope="col">신고자</th>
           <th scope="col">신고대상</th>
           <th scope="col">유형</th>
-          <th scope="col" width="80">대상</th>
+          <th scope="col" width="120">대상</th>
         </tr>
       </thead>
       <tbody>
@@ -78,6 +78,9 @@
       </div>
     </div>
 
+    <button v-if="reportInfo.target === '자기소개'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
+    @click="moveSelfIntroducePage">자기소개 페이지 이동</button>
+
     <button v-if="reportInfo.target === '게시글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
     @click="moveBoard(reportInfo.captureTargetContent._id)">게시글 이동</button>
     <button v-if="reportInfo.target === '게시글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
@@ -120,6 +123,9 @@ export default {
     },
     moveBoard: function (boardId) {
       this.$router.push(`/community/detail/${boardId}`)
+    },
+    moveSelfIntroducePage: function () {
+      this.$router.push(`/matching/detail/${this.reportInfo.reportedUserId}`)
     },
     loadingCommentList: function (userId, boardId) {
       this.isShowCommentList = !this.isShowCommentList

@@ -109,6 +109,23 @@ export default {
         alert(error.response.data.errorMessage)
       })
     },
+    reportSelfIntroduction: function () {
+      let postBody = {
+        target: this.target,
+        reportType: this.reportType,
+        reportContent: this.reportContent,
+      }
+
+      this.$http.post(`/user/${this.friendId}/report`, postBody)
+      .then((response) => {
+        alert('신고 접수가 완료되었습니다.\n감사합니다.')
+        $('#close').trigger('click')
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+    },
     reportRoute: function () {
       if (this.reportContent.trim() === '') {
         alert('내용을 입력해주세요.')
@@ -126,6 +143,8 @@ export default {
         this.reportBoard()
       } else if (this.target === '댓글') {
         this.reportComment()
+      } else if (this.target === '자기소개') {
+        this.reportSelfIntroduction()
       }
     }
   },

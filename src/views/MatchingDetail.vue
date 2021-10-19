@@ -5,6 +5,9 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
+    <button v-if="isResponseComplete" class="btn btn-warning report-button" data-toggle="modal" data-target="#reportUserModal">
+      신고
+    </button>
     <table class="table table-bordered shadow-sm" v-if="isResponseComplete">
       <thead class="thead-dark">
         <tr>
@@ -35,12 +38,16 @@
       <span v-show="isRequestFriendLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       <span ref="requestFriendButtonText">친구 신청</span>
     </button>
+    <ReportUserModal :target="'자기소개'" :friendId="$route.params.id"/>
   </div>
 </template>
 
 <script>
+import ReportUserModal from '@/components/ReportUserModal.vue'
+
 export default {
   name: "MatchingDetail",
+  components: { ReportUserModal },
   data: () => {
     return {
       isResponseComplete: false,
@@ -112,6 +119,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.report-button {
+  float: right;
+  margin-bottom: 10px;
+}
 .spinner-border-sm {
   margin-right: 10px;
   margin-bottom: 4px;
