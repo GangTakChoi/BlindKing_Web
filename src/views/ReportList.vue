@@ -18,27 +18,44 @@
         </tr>
       </tbody>
     </table>
+    <button v-if="isMoreButton" class="btn btn-light btn-block shadow" @click="loadData">더보기</button>
   </div>
 </template>
 
 <script>
+const LIMIT = 10
+
 export default {
   name: "ReportList",
   data () {
     return {
-      reportList: []
+      reportList: [],
+      isMoreButton: true,
     }
   },
   methods: {
     moveReportDetail: function (reportId) {
       this.$router.push('/report/' + reportId)
     },
+    loadData: function () {
+      let skip = this.reportList.length
+
+      let url = `/user/report-list?skip=${skip}&limit=${LIMIT}`
+
+      this.$http.get(url)
+      .then((response) => {
+        this.reportList = this.reportList.concat(response.data.reportList)
+
+        if (response.data.reportList.length < LIMIT) this.isMoreButton = false
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+    },
   },
   created () {
-    this.$http.get('/user/report-list')
-    .then((response) => {
-      this.reportList = response.data.reportList
-    })
+    this.loadData()
   }
 }
 </script>
