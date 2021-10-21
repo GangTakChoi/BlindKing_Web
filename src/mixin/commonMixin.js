@@ -61,6 +61,11 @@ let commonMixin = {
 
       return returnData
     },
+    getDate: function (timestamp) {
+      let dateInfo = this.convertDateToTimestamp(timestamp)
+
+      return `${dateInfo.year}/${dateInfo.month}/${dateInfo.day} ${dateInfo.hours}:${dateInfo.minutes}`
+    },
     getIsHistoryBack: function () {
       let today = new Date()
       let nowTimestamp = today.getTime()

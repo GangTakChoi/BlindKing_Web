@@ -101,11 +101,14 @@
                • {{ getDate(commentInfo.createdAt) }}
             </span>
           </span>
-          <span class="row-detail">
-            <router-link :to="'/community/detail/' + commentInfo.boardId._id">
-              {{ commentInfo.boardId.title }}
+          <span v-if="commentInfo.boardInfo.length > 0" class="row-detail">
+            <router-link :to="'/community/detail/' + commentInfo.boardInfo[0]._id">
+              {{ commentInfo.boardInfo[0].title }}
             </router-link>
             {{ ' 게시글에 남긴 댓글'}} 
+          </span>
+          <span v-else class="row-detail cancel-text">
+            삭제된 게시판
           </span>
           <hr v-if="commentList.length !== index + 1">
         </div>

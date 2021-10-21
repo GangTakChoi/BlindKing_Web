@@ -44,20 +44,22 @@
           <th scope="col">신고대상</th>
           <th scope="col">유형</th>
           <th scope="col" width="120">대상</th>
+          <th scope="col" width="150">신고일시</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(reportInfo, index) in reportList" :key="index">
           <td scope="row">{{reportInfo.reporterNickname}}</td>
-          <td>{{reportInfo.reportedUserNickname}}</td>
+          <td>{{ reportInfo.reportedUserNickname }}</td>
           <td>{{ reportInfo.type }}</td>
           <td @click="moveReportDetail(reportInfo._id)" class="btn-link target">{{ reportInfo.target }}</td>
+          <td>{{ getDate(reportInfo.createdAt) }}</td>
         </tr>
         <tr v-if="isResponseComplete && reportList.length === 0">
-          <td colspan="4">조회된 신고목록이 없습니다.</td>
+          <td colspan="5">조회된 신고목록이 없습니다.</td>
         </tr>
         <tr v-if="!isResponseComplete">
-          <td colspan="4">
+          <td colspan="5">
             <div>
               <div class="d-flex justify-content-center" style="margin: 40px 0">
                 <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
@@ -82,7 +84,7 @@ export default {
     return {
       isResponseComplete: false,
       reportList: [],
-      isMoreButton: true,
+      isMoreButton: false,
       inputReportType: null,
       inputReportTarget: null,
       inputReporter: '',
@@ -94,7 +96,7 @@ export default {
       this.$router.push('/report/' + reportId)
     },
     loadData: function (type) {
-      this.isMoreButton = true
+      this.isMoreButton = false
       this.isResponseComplete = false
 
       if (type === 'search') this.reportList = []
@@ -111,6 +113,8 @@ export default {
         this.reportList = this.reportList.concat(response.data.reportList)
 
         if (response.data.reportList.length < LIMIT) this.isMoreButton = false
+        else this.isMoreButton = true
+        
         this.isResponseComplete = true
       })
       .catch((error) => {

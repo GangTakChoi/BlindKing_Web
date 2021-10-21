@@ -1,12 +1,13 @@
 <template>
   <div class="content-container">
-    <table class="table text-left">
+    <table class="table text-center">
       <thead class="thead-dark">
         <tr>
           <th scope="col">신고자</th>
           <th scope="col">신고대상</th>
           <th scope="col">유형</th>
           <th scope="col" width="120">대상</th>
+          <th scope="col" width="160">신고일시</th>
         </tr>
       </thead>
       <tbody>
@@ -15,6 +16,7 @@
           <td>{{ reportInfo.reportedUserNickname}}</td>
           <td>{{ reportInfo.type }}</td>
           <td>{{ reportInfo.target }}</td>
+          <td>{{ getDate(reportInfo.createdAt) }}</td>
         </tr>
       </tbody>
     </table>
@@ -116,11 +118,6 @@ export default {
     }
   },
   methods: {
-    getDate: function (timestamp) {
-      let dateInfo = this.convertDateToTimestamp(timestamp)
-
-      return `${dateInfo.year}/${dateInfo.month}/${dateInfo.day} ${dateInfo.hours}:${dateInfo.minutes}`
-    },
     moveBoard: function (boardId) {
       this.$router.push(`/community/detail/${boardId}`)
     },
