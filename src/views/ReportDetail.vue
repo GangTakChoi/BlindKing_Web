@@ -37,7 +37,7 @@
       </tbody>
     </table>
 
-    <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#reportUserActiveStop">활동정지</button>
+    <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#reportUserActiveStopModal">활동정지</button>
 
     <button v-if="reportInfo.target === '댓글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
     @click="isShowCaptureComment = !isShowCaptureComment">신고 대상 댓글 내용보기</button>
@@ -107,16 +107,16 @@
       <div class="content ck-content" v-html="reportInfo.captureTargetContent.content">
       </div>
     </div>
-    <ReportUserActiveStop :reportedNickname="reportInfo.reportedUserNickname" :reportedUserId="reportInfo.reportedUserId"/>
+    <ReportUserActiveStopModal :reportedNickname="reportInfo.reportedUserNickname" :reportedUserId="reportInfo.reportedUserId"/>
   </div>
 </template>
 
 <script>
-import ReportUserActiveStop from '@/components/ReportUserActiveStop.vue'
+import ReportUserActiveStopModal from '@/components/ReportUserActiveStopModal.vue'
 
 export default {
   name: 'ReportDetail',
-  components: { ReportUserActiveStop },
+  components: { ReportUserActiveStopModal },
   data () {
     return {
       isShowCaptureComment: false,
