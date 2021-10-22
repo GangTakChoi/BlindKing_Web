@@ -22,8 +22,8 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="inputId">자세한 내용</label>
-              <textarea class="form-control" rows="5" v-model="reportContent"></textarea>
+              <label for="inputContent">자세한 내용</label>
+              <textarea id="inputContent" class="form-control" rows="5" v-model="reportContent"></textarea>
             </div>
           </form>
         </div>

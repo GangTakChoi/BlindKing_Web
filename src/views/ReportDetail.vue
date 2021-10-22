@@ -12,8 +12,12 @@
       </thead>
       <tbody>
         <tr>
-          <td scope="row">{{ reportInfo.reporterNickname}}</td>
-          <td>{{ reportInfo.reportedUserNickname}}</td>
+          <td scope="row">
+            {{ reportInfo.reporterNickname}}
+          </td>
+          <td>
+            {{ reportInfo.reportedUserNickname}}
+          </td>
           <td>{{ reportInfo.type }}</td>
           <td>{{ reportInfo.target }}</td>
           <td>{{ getDate(reportInfo.createdAt) }}</td>
@@ -32,6 +36,8 @@
         </tr>
       </tbody>
     </table>
+
+    <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#reportUserActiveStop">활동정지</button>
 
     <button v-if="reportInfo.target === '댓글'" type="button" class="btn btn-outline-secondary btn-lg btn-block"
     @click="isShowCaptureComment = !isShowCaptureComment">신고 대상 댓글 내용보기</button>
@@ -101,12 +107,16 @@
       <div class="content ck-content" v-html="reportInfo.captureTargetContent.content">
       </div>
     </div>
+    <ReportUserActiveStop :reportedNickname="reportInfo.reportedUserNickname" :reportedUserId="reportInfo.reportedUserId"/>
   </div>
 </template>
 
 <script>
+import ReportUserActiveStop from '@/components/ReportUserActiveStop.vue'
+
 export default {
   name: 'ReportDetail',
+  components: { ReportUserActiveStop },
   data () {
     return {
       isShowCaptureComment: false,
