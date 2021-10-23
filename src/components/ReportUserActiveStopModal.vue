@@ -14,7 +14,8 @@
             <div class="form-group">
               <label for="exampleFormControlSelect1">정지 기간</label>
               <select class="form-control" id="exampleFormControlSelect1" v-model="stopPrieod">
-                <option selected value="1주일">1주일</option>
+                <option selected value="3일">3일</option>
+                <option value="1주일">1주일</option>
                 <option value="1개월">1개월</option>
                 <option value="3개월">3개월</option>
                 <option value="6개월">6개월</option>
@@ -51,7 +52,7 @@ export default {
   },
   data () {
     return {
-      stopPrieod: '1주일',
+      stopPrieod: '3일',
       content: '',
     }
   },
