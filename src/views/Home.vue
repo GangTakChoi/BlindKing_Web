@@ -52,6 +52,11 @@
           신고관리
         </button>
       </router-link>
+      <router-link v-if="isAdmin" to="/manage-question">
+        <button class="basic-button-design shadow-sm rounded">
+          질문관리
+        </button>
+      </router-link>
       <!-- <router-link to="www.naver.com" target="_blank"> -->
       <a href="https://toon.at/donate/637662824189086998" target="_blank">
         <button class="basic-button-design shadow-sm rounded">

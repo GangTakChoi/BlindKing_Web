@@ -30,21 +30,16 @@
         </select>
       </div>
 
-      <template v-for="order in questionList.length">
-        <template v-for="(questionInfo, index) in questionList">
-          <div v-if="questionInfo.questionId.order === order" class="form-group" :key="index+order">
-            <div class="label-wrap">
-              <label for="exampleFormControlInput1">{{questionInfo.questionId.content}}</label>
-              <label class="text-length" :class="{ 'text-danger':  questionInfo.answer.length > 5000 }"> {{ questionInfo.answer.length + '/5000' }} </label>
-            </div>
-            
-            <input v-if="questionInfo.questionId.inputType === 'input'" type="text" class="form-control" v-model="questionInfo.answer">
-            <textarea v-else-if="questionInfo.questionId.inputType === 'textarea'" class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
-            <textarea v-else class="form-control" rows="5" v-model="questionInfo.answer"></textarea>
-          </div>
-        </template>
-      </template>
-      
+      <div v-for="(userQuestionAnswerInfo, index) in userQuestionAnswerInfoList" class="form-group" :key="index">
+        <div class="label-wrap">
+          <label for="exampleFormControlInput1">{{userQuestionAnswerInfo.content}}</label>
+          <label class="text-length"> {{ `${userQuestionAnswerInfo.answer.length}/5000` }} </label>
+        </div>
+
+        <input v-if="userQuestionAnswerInfo.inputType === 'input'" type="text" class="form-control" v-model="userQuestionAnswerInfo.answer">
+        <textarea v-else-if="userQuestionAnswerInfo.inputType === 'textarea'" class="form-control" rows="5" v-model="userQuestionAnswerInfo.answer"></textarea>
+        <textarea v-else class="form-control" rows="5" v-model="userQuestionAnswerInfo.answer"></textarea>
+      </div>
       
       <button type="submit" class="btn btn-primary btn-lg btn-block complete-btn" :disabled="isSaving">작성완료</button>
     </form>
@@ -65,7 +60,7 @@ export default {
       subArea: {},
       isResponseComplete: false,
       birthYear: 0,
-      questionList: [],
+      userQuestionAnswerInfoList: [],
       getYears: () => {
         var now = new Date();	// 현재 날짜 및 시간
         var year = now.getFullYear() - 19;	// 올해 성년 출생년도
@@ -102,24 +97,23 @@ export default {
         reqBody.subAreaCode = this.selectSubAreaCode
       }
 
-      let questionListUpdateInfo = []
-      let inputLengthLimitCheck = false
+      let questionListUpdateInfoList = []
 
-      this.questionList.forEach((element, index) => {
-        if (element.answer.length > 5000) inputLengthLimitCheck = true
-
-        questionListUpdateInfo[index] = {
-          answer: element.answer,
-          questionId: element.questionId._id
+      this.userQuestionAnswerInfoList.forEach((userQuestionAnswerInfo) => {
+        if (userQuestionAnswerInfo.answer.length > 5000) {
+           alert("작성 내용중 5000자를 넘기는 응답란이 있습니다.")
+          return 
         }
+
+        let questionListUpdateInfo= {
+          answer: userQuestionAnswerInfo.answer,
+          questionId: userQuestionAnswerInfo.questionId
+        }
+
+        questionListUpdateInfoList.push(questionListUpdateInfo)
       })
 
-      if (inputLengthLimitCheck) {
-        alert("작성 내용중 5000자를 넘기는 응답란이 있습니다.")
-        return 
-      }
-
-      reqBody.questionList = questionListUpdateInfo
+      reqBody.questionList = questionListUpdateInfoList
 
       this.isSaving = true
 
@@ -144,20 +138,34 @@ export default {
         let userInfo = response.data.userInfo
         this.birthYear = userInfo.birthYear
         this.userMBTI = userInfo.mbti
-        this.questionList = userInfo.questionList
+        this.selectUpperAreaCode = userInfo.region.rootAreaCode
+        this.selectSubAreaCode = userInfo.region.subAreaCode
+
+        // 질문 및 유저 대답 정보
+        response.data.questionList.forEach((questionInfo) => {
+          let tempUserQuestionAnswerInfo = {
+            questionId: questionInfo._id,
+            content: questionInfo.content,
+            inputType: questionInfo.inputType,
+            answer: ''
+          }
+
+          userInfo.questionList.forEach((userQuestionAnswerInfo) => {
+            if (questionInfo._id === userQuestionAnswerInfo.questionId) {
+              tempUserQuestionAnswerInfo.answer = userQuestionAnswerInfo.answer
+            }
+          })
+
+          this.userQuestionAnswerInfoList.push(tempUserQuestionAnswerInfo)
+        })
 
         // 지역 정보
         let regionInfo = response.data.regionInfo
 
-        if (userInfo.region !== undefined) {
-          this.selectUpperAreaCode = userInfo.region.rootAreaCode
-          this.selectSubAreaCode = userInfo.region.subAreaCode
-        }
-
-        // 도,시 지역 할당
+        // 상위 지역 할당
         this.upperArea = regionInfo.upperArea
 
-        // 구 지역 할당
+        // 하위 지역 할당
         await regionInfo.subArea.forEach((areaInfo) => {
           let isSubArea = Object.keys(this.subArea).includes(areaInfo.parentCode)
 
