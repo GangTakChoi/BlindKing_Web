@@ -20,7 +20,7 @@
         </span>
         
         <div class="friend-row-button-wrap chatting">
-          <span v-if="friendInfo.unreadMessageCount !== 0" class="unread-count-info">{{ friendInfo.unreadMessageCount }}</span>
+          <span v-if="friendInfo.isUnReadMessage" class="unread-count-info">{{ '*' }}</span>
           <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, key, $event)">
             대화방
           </button>
@@ -123,7 +123,7 @@ export default {
     moveChattingRoom: function (friendObjectId, friendNickName, key, e) {
       // Event Bubbling 방지
       e.stopPropagation()
-      this.friendAcceptList[key].unreadMessageCount = 0
+      this.friendAcceptList[key].isUnReadMessage = false
       this.$router.push('/chatting-room/' + friendObjectId + '?nickname=' + friendNickName);
     },
     releaseBlock: function (friendObjectId, e) {

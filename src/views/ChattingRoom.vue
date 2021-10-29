@@ -45,6 +45,7 @@ import ReportUserModal from '@/components/ReportUserModal.vue'
 import VueCookies from 'vue-cookies'
 
 const TOKEN = VueCookies.get('token');
+const NICKNAME = VueCookies.get('nickname');
 
 export default {
   name: "ChattingRoom",
@@ -72,7 +73,7 @@ export default {
       }
 
       let msgInfo = {
-        token: TOKEN,
+        nickname: NICKNAME,
         msg: this.message
       }
 
@@ -126,7 +127,7 @@ export default {
     this.socket.on("brodcastMessage", async (data) => {
       let myGender = VueCookies.get('gender')
       let yourGender = myGender === 'male' ? 'female' : 'male'
-      let isMe = data.token === TOKEN ? true : false
+      let isMe = data.nickname === NICKNAME ? true : false
 
       let msgInfo = {
         isMe: isMe,
@@ -138,6 +139,8 @@ export default {
 
       var displayDiv = document.getElementById("chatting-message-display")
       displayDiv.scrollTop = displayDiv.scrollHeight
+
+      if (!isMe) this.socket.emit("completeRead")
     })
 
     this.socket.on("disconnect", () => {
