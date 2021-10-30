@@ -72,6 +72,7 @@ let commonMixin = {
       let backTimestamp = Number(localStorage.getItem("뒤로가기발생시간"))
       let savedData = localStorage.getItem(this.$route.name)
 
+      // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
       return ( nowTimestamp - backTimestamp ) <= 100 && savedData !== null
     },
     getCache: function () {
@@ -83,6 +84,12 @@ let commonMixin = {
   },
   created () {
     this.isAdmin = VueCookies.get('roleName') === 'admin' ? true : false
+
+    // 뒤로가기 이벤트
+    window.onpopstate = function(event) {
+      let nowDate = new Date();
+      localStorage.setItem("뒤로가기발생시간", nowDate.getTime())
+    };
   },
 }
 

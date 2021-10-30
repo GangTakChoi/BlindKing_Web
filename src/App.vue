@@ -111,17 +111,7 @@ export default {
         console.log(error)
       }
     }
-
-    // 뒤로가기 이벤트 발생시
-    window.onpopstate = function(event) {
-      let today = new Date();   
-
-      localStorage.setItem("뒤로가기발생시간", today.getTime())
-    };
   },
-  mounted () {
-    window.addEventListener('resize', this.windowWidthResize);
-  }
 }
 </script>
 

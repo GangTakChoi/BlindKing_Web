@@ -232,7 +232,6 @@ export default {
     this.FRIEND_REQUEST_PAGE = FRIEND_REQUEST_PAGE
     this.BLOCK_PAGE = BLOCK_PAGE
 
-    // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
     if ( this.getIsHistoryBack() ) {
       Object.assign(this.$data, JSON.parse(this.getCache()))
       this.isResponseComplete = true

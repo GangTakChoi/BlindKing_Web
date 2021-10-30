@@ -89,11 +89,16 @@
             </tr>
           </tbody>
         </table>
-        <template v-for="(questionInfo, index) in partnerInfo.questionList">
-          <div v-if="questionInfo.answer.trim()" class="partner-card-body" :key="index">
-            <div class="question-section">{{ questionInfo.questionId.content }}</div>
-            <pre class="answer-section">{{ questionInfo.answer }}</pre>
-          </div>
+        <template v-for="(questionInfo, root_index) in questionList">
+
+          <template v-for="(questionAnswerInfo, sub_index) in partnerInfo.questionAnswerInfoList ">
+            <div v-if=" questionAnswerInfo.questionId === questionInfo._id && questionAnswerInfo.answer.trim() !== ''" 
+            class="partner-card-body" :key="root_index + sub_index">
+              <div class="question-section">{{ questionInfo.content }}</div>
+              <pre class="answer-section">{{ questionAnswerInfo.answer }}</pre>
+            </div>
+          </template>
+
         </template>
         <div class="detail-btn-blank"></div>
         <router-link :to="getDetailLink(partnerInfo._id)">
@@ -120,6 +125,7 @@ export default {
       isShowLoading: false,
       isShowPartnerList: true,
       isShowMoreButton: false,
+      questionList: [],
       mbtiList: [],
       upperAreaList: [],
       subAreaInfo: {
@@ -268,6 +274,7 @@ export default {
         }
         
         if (isInitial) {
+          this.questionList = response.data.questionList
           this.mbtiList = response.data.mbtiList
           let regionInfo = response.data.regionInfo
           this.upperAreaList = regionInfo.upperArea
@@ -306,7 +313,6 @@ export default {
   },
   async created () {
     try {
-      // 현재 타임스탬프와 뒤로가기 시점의 타임스탬프 차이가 100ms 이하라면 뒤로가기 페이지로 판단
       if ( this.getIsHistoryBack() ) {
         Object.assign(this.$data, JSON.parse(this.getCache()))
       } else {
@@ -316,7 +322,6 @@ export default {
       alert('페이지 로딩중 문제가 발생하였습니다.')
       console.log(error)
     }
-    
   },
   beforeRouteLeave (to, from, next) {
     this.saveCache(this.$data)

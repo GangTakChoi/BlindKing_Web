@@ -55,7 +55,7 @@ export default {
           this.$global.isLogin = true
           this.$emit('loginSuccess')
           $('#close').trigger('click')
-          location.reload()
+          this.$router.push('/');
         }
       }).catch((error) => {
         alert(error.response.data.errorMessage)

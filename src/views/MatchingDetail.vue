@@ -24,15 +24,21 @@
         </tr>
       </tbody>
     </table>
-    <template v-for="(questionInfo, index) in questionList">
-      <div v-if="questionInfo.answer.trim()" class="card" :key="index">
-        <div class="card-body">
-          <h5 class="card-title">{{ questionInfo.questionId.content }}</h5>
-          <hr>
-          <pre class="card-text">{{ questionInfo.answer }}</pre>
+    <template v-for="(questionInfo, root_index) in questionList">
+
+      <template v-for="(questionAnswerInfo, sub_index) in questionUserAnswerInfoList">
+        <div v-if="questionInfo._id === questionAnswerInfo.questionId && questionAnswerInfo.answer.trim() !== ''"
+        class="card" :key="root_index + sub_index">
+          <div class="card-body">
+            <h5 class="card-title">{{ questionInfo.content }}</h5>
+            <hr>
+            <pre class="card-text">{{ questionAnswerInfo.answer }}</pre>
+          </div>
         </div>
-      </div>
+      </template>
+
     </template>
+
     <button v-if="isResponseComplete" ref="requestFriendButton" type="button" class="btn btn-primary btn-lg add-friend-btn" 
       @click="requestFriend" :disabled="isRequestFriendLoading">
       <span v-show="isRequestFriendLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -53,6 +59,7 @@ export default {
       isResponseComplete: false,
       isRequestFriendLoading: false,
       questionList: [],
+      questionUserAnswerInfoList: [],
       age: "",
       mbti: "",
       nickname: "",
@@ -107,7 +114,8 @@ export default {
         this.age = userDetailInfo.birthYear === 0 ? "?" : this.getAge(userDetailInfo.birthYear)
         this.nickname = userDetailInfo.nickname
         this.mbti = userDetailInfo.mbti
-        this.questionList = userDetailInfo.questionList
+        this.questionList = response.data.questionList
+        this.questionUserAnswerInfoList = userDetailInfo.questionAnswerInfoList 
         this.isResponseComplete = true
       } catch (e) {
         console.log(e)

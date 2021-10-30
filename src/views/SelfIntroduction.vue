@@ -150,7 +150,7 @@ export default {
             answer: ''
           }
 
-          userInfo.questionList.forEach((userQuestionAnswerInfo) => {
+          userInfo.questionAnswerInfoList.forEach((userQuestionAnswerInfo) => {
             if (questionInfo._id === userQuestionAnswerInfo.questionId) {
               tempUserQuestionAnswerInfo.answer = userQuestionAnswerInfo.answer
             }
