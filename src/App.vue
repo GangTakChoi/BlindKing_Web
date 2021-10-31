@@ -1,17 +1,21 @@
 <template>
   <div id="app">
-    <div id="nav" class="shadow-sm">
-      <div class="logo-wrap">
-        <router-link to="/">
-          <img alt="logo" src="./assets/img/BlindKing2.png" class="logo_img">
-        </router-link>
+    <div v-show="isShowNav" id="nav" class="shadow-sm">
+
+      <div class="logo-wrap" v-if="!($global.isMobile && !isHome)" >
+        <img  @click="$router.push('/');" alt="logo" src="./assets/img/BlindKing2.png" class="logo_img">
       </div>
+
+      <div class="page-move-button-wrap" v-else>
+        <img @click="goBack" src="./assets/img/arrow-left-circle.svg">
+        <img @click="$router.push('/');" src="./assets/img/house.svg">
+      </div>
+
       <div class="login-wrap">
         <div v-if="!$global.isLogin">
           <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModal">
             로그인
           </button>
-          <LoginModal @loginSuccess="chattingAlimSocketConnect"/>
         </div>
         <div v-else>
           <button type="button" class="btn btn-dark" @click="logout">
@@ -20,12 +24,16 @@
         </div>
       </div>
     </div>
+
+    <div v-if="$global.isMobile" class="nav-blank"></div>
+
     <div class="main-container">
       <div v-if="!$global.isMobile && !isHome" class="go-back" @click="goBack">
       </div>
       <router-view/>
     </div>
     <ToastPopup :nickname="alimInfo.nickname" :message="alimInfo.message"/>
+    <LoginModal @loginSuccess="chattingAlimSocketConnect"/>
   </div>
 </template>
 
@@ -49,6 +57,15 @@ export default {
         message: 'test',
       }
     }
+  },
+  computed: {
+    isShowNav: function () {
+      if (!this.$global.isMobile) return true
+
+      if (this.$route.name === 'ChattingRoom') return false
+
+      return true
+    },
   },
   methods: {
     chattingAlimSocketConnect: function () {
@@ -124,9 +141,24 @@ export default {
   background-color: #fff;
 }
 
+@media (max-width: 768px) {
+  #nav {
+    height: 65px;
+    position: fixed;
+    width: 100%;
+    z-index: 9;
+  }
+  .nav-blank {
+    height: 65px;
+  }
+}
+
 .logo-wrap {
   height: 66px;
   display:inline-block;
+  img {
+    cursor: pointer;
+  }
 }
 
 .logo_img {
@@ -139,9 +171,27 @@ export default {
   display: inline-block;
 }
 
+.page-move-button-wrap {
+  margin-left: 5px;
+  display:inline-block;
+  padding: 15px;
+  img {
+    width: 35px;
+  }
+  img:not(:last-child) {
+    margin-right: 30px;
+  }
+}
+
 .login-wrap {
   float: right;
   margin: 14px 19px;
+}
+
+@media (max-width: 768px) {
+  .login-wrap {
+    margin: 14px;
+  }
 }
 
 .login-button {

@@ -19,7 +19,7 @@
       </div>
       <div class="input-section">
         <small v-if="!$global.isMobile" id="emailHelp" class="form-text text-muted">줄바꿈 shift + enter</small>
-        <textarea :disabled="isClose" v-if="!$global.isMobile" v-model="message" class="form-control" rows="3" v-on:keydown.enter="sendMessage" v-on:keyup.enter.prevent maxlength="5000">
+        <textarea :disabled="isClose" v-if="!$global.isMobile" v-model="message" class="form-control" rows="3" v-on:keypress.enter="sendMessage" v-on:keyup.enter.prevent maxlength="5000">
         </textarea>
         <textarea :disabled="isClose" v-else v-model="message" class="form-control" rows="3" maxlength="5000">
         </textarea>
@@ -30,9 +30,7 @@
 
     <!-- 모바일에서만 표시되는 뒤로가기 버튼 -->
     <div v-if="$global.isMobile" class="back-button" @click="goBack">
-      <svg fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
-      </svg>
+      <img src="@/assets/img/arrow-left-circle.svg" width="25"/>
     </div>
 
     <ReportUserModal :friendId="$route.params.friendObjectId" :target="'채팅'"/>

@@ -89,17 +89,21 @@
             </tr>
           </tbody>
         </table>
-        <template v-for="(questionInfo, root_index) in questionList">
 
-          <template v-for="(questionAnswerInfo, sub_index) in partnerInfo.questionAnswerInfoList ">
-            <div v-if=" questionAnswerInfo.questionId === questionInfo._id && questionAnswerInfo.answer.trim() !== ''" 
-            class="partner-card-body" :key="root_index + sub_index">
-              <div class="question-section">{{ questionInfo.content }}</div>
-              <pre class="answer-section">{{ questionAnswerInfo.answer }}</pre>
-            </div>
+        <!-- 파트너 질의문답 부분 -->
+        <div class="question-answer-section">
+          <template v-for="(questionInfo, root_index) in questionList">
+            <template v-for="(questionAnswerInfo, sub_index) in partnerInfo.questionAnswerInfoList">
+              <div v-if=" questionAnswerInfo.questionId === questionInfo._id && questionAnswerInfo.answer.trim() !== ''" 
+              class="partner-card-body" :key="root_index + sub_index">
+                <div class="question-section">{{ questionInfo.content }}</div>
+                <pre class="answer-section">{{ questionAnswerInfo.answer }}</pre>
+              </div>
+            </template>
           </template>
+        </div>
+        
 
-        </template>
         <div class="detail-btn-blank"></div>
         <router-link :to="getDetailLink(partnerInfo._id)">
           <button type="submit" class="btn btn-primary btn-lg btn-block detail-btn">자세히 보기</button>
@@ -331,6 +335,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.question-answer-section {
+  max-height: 400px;
+  overflow: auto;
+  margin-bottom: 12px;
+  padding-right: 5px;
+}
 .content-container {
   font-size: 17px;
 }
