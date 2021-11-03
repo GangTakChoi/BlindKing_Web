@@ -1,88 +1,87 @@
 <template>
   <div class="content-container">
-    <div  v-if="this.$global.isLogin">
-      <router-link to="/">
-        <button v-if="isActiveMatching" class="top-show-button basic-button-design shadow-sm rounded" @click="useTopDisplay">
-          매칭 상위 노출
-          <br>
-          <span v-if="isBlockUseTopMatchingDisplay" style="font-size:16px; font-weight:normal; color: red;">
-            재사용 대기시간 {{reUseWaitingTime}}
-          </span>
-          <span v-else style="font-size:16px; font-weight:normal; color: red;" class="blinking">
-            사용 가능 (재사용 대기시간: 4시간)
-          </span>
-        </button>
-        <button class="matching-active-button basic-button-design shadow-sm rounded" @click="activeMatching" :disabled="isLoadActiveMatching">
-          매칭 활성화 
-          <span class="on-off-button" :class="{ 'matching-on-status-style': isMatchingOnStyle, 'matching-off-status-style': isMatchingOffStyle }">
-            <div v-if="isLoadActiveMatching" class="spinner-border" role="status" style="width: 1.1rem; height: 1.1rem;">
-              <span class="sr-only">Loading...</span>
-            </div>
-            <span v-if="!isLoadActiveMatching">{{ isActiveMatching ? 'ON' : 'OFF' }}</span>
-          </span>
-        </button>
-      </router-link>
-      <router-link to="/self-introduction">
-        <button class="self-introduce-button basic-button-design shadow-sm rounded">
-          자기소개 작성
-        </button>
-      </router-link>
-      <router-link to="/matching">
-        <button class="matching-button basic-button-design shadow-sm rounded">
-          인연 찾기
-        </button>
-      </router-link>
-      <router-link to="/friends">
-        <button class="basic-button-design shadow-sm rounded">
-          친구목록
-        </button>
-      </router-link>
-      <router-link to="/community">
-        <button class="basic-button-design shadow-sm rounded">
-          커뮤니티
-        </button>
-      </router-link>
-      <router-link to="/mypage">
-        <button class="basic-button-design shadow-sm rounded">
-          내정보
-        </button>
-      </router-link>
-      <router-link v-if="isAdmin" to="/report">
-        <button class="basic-button-design shadow-sm rounded">
-          신고관리
-        </button>
-      </router-link>
-      <router-link v-if="isAdmin" to="/manage-question">
-        <button class="basic-button-design shadow-sm rounded">
-          질문관리
-        </button>
-      </router-link>
-      <!-- <router-link to="www.naver.com" target="_blank"> -->
+    <div v-if="!$global.isLogin && !$global.isLoading">
+      <div class="jumbotron jumbotron-fluid rounded" @click="test">
+        <div class="container">
+          <h1 class="display-5">안녕하세요, BlindKing 입니다.</h1>
+          <pre class="lead">
+            이 싸이트는 완전 무료 소개팅을 목적으로 만들어졌습니다.
+            기존 유료로 사용되는 소개팅을 이용해 본 적이 있고
+            "과연 돈이 개입된 시스템에서 남녀간의 순수한 만남이 가능할까?" 라는 생각을 하였고
+            완전 무료인 소개팅 서비스가 있었으면 좋겠다 라는 마음로 제작하게 된 싸이트입니다.
+
+            또한 제작자인 저의 취향으로 오직 그 사람이 어떤 가치, 감정을 추구하는 사람인지
+            아는 것에 초점을 맞추서 제작되어 본인 사진은 등록할 수 없다는 점 참고해주세요.
+
+            커뮤니티 기능이 있어 회원분들과 소통하며 이 싸이트를 발전시키고 싶고
+            여러분들 인생에 긍정적인 영향을 끼칠 수 있는 서비스가 되도록 하겠습니다.
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <div>
+
+      <button @click="activeMatching" :disabled="isLoadActiveMatching || !$global.isLogin" class="matching-active-button basic-button-design shadow-sm rounded">
+        매칭 활성화 
+        <span class="on-off-button" :class="{ 'matching-on-status-style': isMatchingOnStyle, 'matching-off-status-style': isMatchingOffStyle }">
+          <div v-if="isLoadActiveMatching" class="spinner-border" role="status" style="width: 1.1rem; height: 1.1rem;">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <span v-else>{{ $global.isActiveMatching ? 'ON' : 'OFF' }}</span>
+        </span>
+      </button>
+
+      <button v-if="$global.isActiveMatching" @click="useTopDisplay" class="top-show-button basic-button-design shadow-sm rounded">
+        매칭 상위 노출
+        <br>
+        <span v-if="isBlockUseTopMatchingDisplay" style="font-size:16px; font-weight:normal; color: red;">
+          재사용 대기시간 {{reUseWaitingTime}}
+        </span>
+        <span v-else class="matching-add-info-text blinking">
+          사용 가능 (재사용 대기시간: 4시간)
+        </span>
+      </button>
+
+      <button @click="movePage('자기소개')" class="self-introduce-button basic-button-design shadow-sm rounded" :disabled="!$global.isLogin">
+        자기소개 작성
+      </button>
+      
+      <button @click="movePage('인연찾기')" class="matching-button basic-button-design shadow-sm rounded" :disabled="!$global.isLogin">
+        인연 찾기
+      </button>
+
+      <button @click="movePage('친구목록')" class="basic-button-design shadow-sm rounded" :disabled="!$global.isLogin">
+        친구목록
+      </button>
+
+      <button @click="movePage('커뮤니티')" class="basic-button-design shadow-sm rounded">
+        커뮤니티
+      </button>
+
+      <button @click="movePage('내정보')" class="basic-button-design shadow-sm rounded" :disabled="!$global.isLogin">
+        내정보
+      </button>
+
+      <button v-if="$global.isAdmin && $global.isLogin" @click="movePage('신고관리')" class="basic-button-design shadow-sm rounded">
+        신고관리
+      </button>
+
+      <button v-if="$global.isAdmin && $global.isLogin" @click="movePage('질문관리')" class="basic-button-design shadow-sm rounded">
+        질문관리
+      </button>
+
       <a href="https://toon.at/donate/637662824189086998" target="_blank">
         <button class="basic-button-design shadow-sm rounded">
           후원하기
         </button>
       </a>
-      <!-- </router-link> -->
-      <router-link to="/test">
+
+      <!-- <router-link to="/test">
         <button class="basic-button-design shadow-sm rounded">
           test
         </button>
-      </router-link>
-    </div>
-    <div v-else>
-      <div class="jumbotron jumbotron-fluid rounded">
-        <div class="container">
-          <h1 class="display-5">안녕하세요, 1인 개발자 비발디 입니다.</h1>
-          <pre class="lead">
-            개발자 취업을 위해 포트폴리오용으로 개발된 싸이트이며,
-            평소에 사진이 없는 소개팅이 있으면 좋겠다는 생각을 했고
-            포트폴리오를 만드는 겸 이 싸이트를 개발하게 되었습니다.
-            모든 서비스는 무료로 진행하지만 후원하기 기능과 제 월급을 통해 서버유지비를 충당할 계획이고
-            서버유지비가 감당하기 힘든 수준을 넘어가면 서비스를 중단할 예정입니다.
-          </pre>
-        </div>
-      </div>
+      </router-link> -->
     </div>
   </div>
 </template>
@@ -94,7 +93,6 @@ export default {
   name: 'Home',
   data: () => {
     return {
-      isActiveMatching: false,
       isLoadActiveMatching: false,
       topDisplayReuseLatencyTime: Number,
       matchingTopDisplayUseingTime: Number,
@@ -104,13 +102,23 @@ export default {
   },
   computed: {
     isMatchingOnStyle: function () {
-      return this.isActiveMatching && !this.isLoadActiveMatching
+      return this.$global.isActiveMatching && !this.isLoadActiveMatching
     },
     isMatchingOffStyle: function () {
-      return !this.isActiveMatching && !this.isLoadActiveMatching
+      return !this.$global.isActiveMatching && !this.isLoadActiveMatching
     }
   },
   methods: {
+    movePage: function (type) {
+      if (type === '자기소개') this.$router.push('/self-introduction')
+      else if (type === '인연찾기') this.$router.push('/matching')
+      else if (type === '친구목록') this.$router.push('/friends')
+      else if (type === '커뮤니티') this.$router.push('/community')
+      else if (type === '내정보') this.$router.push('/mypage')
+      else if (type === '신고관리') this.$router.push('/report')
+      else if (type === '질문관리') this.$router.push('/manage-question')
+
+    },
     useTopDisplay: function () {
       this.$http.put('/user/matching-top-display')
       .then((response) => {
@@ -127,9 +135,9 @@ export default {
 
       this.$http.put('/user/active-matching')
       .then((response) => {
-        this.isActiveMatching = response.data.isActiveMatching
+        this.$global.isActiveMatching = response.data.isActiveMatching
 
-        if (this.isActiveMatching) {
+        if (this.$global.isActiveMatching) {
           alert("매칭이 활성화 되었습니다.")
         } else {
           alert("매칭이 비활성화 되었습니다.")
@@ -184,17 +192,18 @@ export default {
     }
   },
   created () {
-    if (VueCookies.get('isActiveMatching') === 'true') this.isActiveMatching = true
-    else this.isActiveMatching = false
-
     this.displayReUseWaitingTime()
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.basic-button-design:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 .disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: default;
 }
 .lead {
@@ -205,11 +214,13 @@ export default {
 .jumbotron-fluid {
   padding-left: 20px;
   padding-right: 20px;
+  max-width: 1000px;
+  margin: 0 auto 50px auto;
   background-color: #dae0e5;
 }
 .basic-button-design {
   display: block;
-  margin: 30px auto 0 auto;
+  margin: 20px auto 0 auto;
   border: solid 0px #000;
   width: 100%;
   max-width: 1000px;
@@ -219,9 +230,6 @@ export default {
   transition-duration: 0.4s;
   box-shadow: 1px 1px 6px -2px black;
   background-color: #fff;
-}
-a:first-of-type .basic-button-design {
-  margin-top: 0;
 }
 .on-off-button {
   position: relative;
@@ -260,11 +268,17 @@ a:first-of-type .basic-button-design {
   // color: #ff5656;
 }
 
+.matching-add-info-text {
+  font-size:16px;
+  font-weight:normal;
+  color: red;
+}
+
 .blinking {
   -webkit-animation:blink 1.0s ease-in-out infinite alternate;
   -moz-animation:blink 1.0s ease-in-out infinite alternate;
   animation:blink 1.0s ease-in-out infinite alternate;
-} 
+}
 @-webkit-keyframes blink {
   0% {opacity:0.3;}
   100% {opacity:1;}

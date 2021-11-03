@@ -15,7 +15,7 @@
           {{ categoryInfo.name }}
         </li>
       </ul>
-      <ul v-if="isAdmin">
+      <ul v-if="$global.isAdmin">
         <li class="category-button shadow-sm" data-toggle="modal" data-target="#addCategory">
           <img class="category-plus-img" src="@/assets/img/plus-lg.svg" alt=""> 추가
         </li>
@@ -117,7 +117,7 @@ export default {
   },
   computed: {
     isShowWriteButton: function () {
-      if (this.isAdmin) {
+      if (this.$global.isAdmin) {
         return true
       }
 
@@ -177,6 +177,10 @@ export default {
       }
     },
     moveWritePage: function () {
+      if (!this.$global.isLogin) {
+        alert('글 작성은 로그인 후 이용해주세요.')
+        return
+      }
       let categoryType = this.getCategoryType(this.selectCategoryId)
       this.$router.push(`/community-write?categoryId=${this.selectCategoryId}&categoryType=${categoryType}`);
     },

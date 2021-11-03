@@ -228,31 +228,43 @@ export default {
       .finally(() => {
         this.isLoadingBoardInfo = false
       })
-    }
+    },
+    loadData () {
+      this.nickname = VueCookies.get('nickname')
+      this.gender = VueCookies.get('gender') === 'male' ? '남성' : '여성'
+
+      this.$http.get('/user/mypage?type=board,comment')
+      .then((response) => {
+        this.boardList = response.data.boardList
+        this.commentList = response.data.commentList
+        this.isResponseComplete = true
+
+        if (response.data.boardList.length < LOAD_LIMIT) {
+          this.isMoreBoardButton = false
+        }
+
+        if (response.data.commentList.length < LOAD_LIMIT) {
+          this.isMoreCommentButton = false
+        }
+      })
+      .catch((error) => {
+        alert(error.response.data.errorMessage)
+        console.log(error)
+      })
+    },
   },
   created () {
-    this.nickname = VueCookies.get('nickname')
-    this.gender = VueCookies.get('gender') === 'male' ? '남성' : '여성'
-
-    this.$http.get('/user/mypage?type=board,comment')
-    .then((response) => {
-      this.boardList = response.data.boardList
-      this.commentList = response.data.commentList
+    if ( this.getIsHistoryBack() ) {
+      Object.assign(this.$data, JSON.parse(this.getCache()))
       this.isResponseComplete = true
-
-      if (response.data.boardList.length < LOAD_LIMIT) {
-        this.isMoreBoardButton = false
-      }
-
-      if (response.data.commentList.length < LOAD_LIMIT) {
-        this.isMoreCommentButton = false
-      }
-    })
-    .catch((error) => {
-      alert(error.response.data.errorMessage)
-      console.log(error)
-    })
+    } else {
+      this.loadData()
+    }
   },
+  beforeRouteLeave (to, from, next) {
+    this.saveCache(this.$data)
+    next()
+  }
 }
 </script>
 

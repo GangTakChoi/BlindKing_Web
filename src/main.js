@@ -8,7 +8,10 @@ import commonMixin from '@/mixin/commonMixin'
 // 전역 변수 등록
 Vue.prototype.$global = Vue.observable({
   isLogin: false,
-  isMobile: Boolean
+  isMobile: Boolean,
+  isAdmin: false,
+  isActiveMatching: false,
+  isLoading: true,
 })
 
 // http request config

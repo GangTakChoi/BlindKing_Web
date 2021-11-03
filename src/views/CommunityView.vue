@@ -3,8 +3,8 @@
     
     <div v-if="isResponseComplete" class="board-controller-wrap">
       <button v-if="isMyBoard" class="shadow-sm" @click="moveModifyPage">글수정</button>
-      <button v-if="isMyBoard || isAdmin" class="shadow-sm" @click="deleteBoard">글삭제</button>
-      <button v-if="!isMyBoard && !isAdminBoard" class="shadow-sm" @click="setReportInfo('게시글')" data-toggle="modal" data-target="#reportUserModal">신고</button>
+      <button v-if="isMyBoard || $global.isAdmin" class="shadow-sm" @click="deleteBoard">글삭제</button>
+      <button v-if="!isMyBoard && !isAdminBoard && $global.isLogin" class="shadow-sm" @click="setReportInfo('게시글')" data-toggle="modal" data-target="#reportUserModal">신고</button>
     </div>
     <div class="board-view-wrap shadow">
       <div v-if="!isResponseComplete" class="d-flex justify-content-center" style="margin: 40px 0">
@@ -26,6 +26,7 @@
         <div class="content ck-content" v-html="content">
           
         </div>
+
         <div class="hand-thumbs-wrap">
           <div class="hand-thumbs-up-wrap" @click="evaluateBoard(true)">
             <img v-if="isBoardHandUp" class="hand-thumbs" src="@/assets/img/hand-thumbs-up-fill.svg">
@@ -38,9 +39,11 @@
             <span class="dislike">{{ dislike.toLocaleString('ko-KR') }}</span>
           </div>
         </div>
+
         <div v-if="isResponseComplete" class="comment-input-section">
-          <textarea class="form-control comment-textarea" v-model="registCommentInput" @keyup="autoHeightTextarea"></textarea>
-          <button class="btn btn-primary comment-regist-button" @click="registComment" :disabled="!isCommentRegistButtonActivity">등록</button>
+          <textarea class="form-control comment-textarea" v-model="registCommentInput" @keyup="autoHeightTextarea" :disabled="!$global.isLogin">
+          </textarea>
+          <button class="btn btn-primary comment-regist-button" @click="registComment" :disabled="!isCommentRegistButtonActivity || !$global.isLogin">등록</button>
         </div>
       </div>
     </div>
@@ -75,15 +78,17 @@
             {{ getCommentDate(commentInfo.createdDate) }}
           </div>
           
-          <!-- 댓글 삭제 -->
-          <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + commentInfo.objectId" type="button" class="close" aria-label="Close" 
-          @click="deleteComment(commentInfo)" data-toggle="modal" data-target="#exampleModal">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <!-- 댓글 신고 -->
-          <button v-else class="close" data-toggle="modal" data-target="#reportUserModal" @click="setReportInfo('댓글', commentInfo.objectId)">
-            <img class="comment-report-img" src="@/assets/img/exclamation.svg" alt="">
-          </button>
+          <template v-if="$global.isLogin">
+            <!-- 댓글 삭제 -->
+            <button v-if="commentInfo.isMine" :id="'deleteCommentButton' + commentInfo.objectId" type="button" class="close" aria-label="Close" 
+            @click="deleteComment(commentInfo)" data-toggle="modal" data-target="#exampleModal">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <!-- 댓글 신고 -->
+            <button v-else class="close" data-toggle="modal" data-target="#reportUserModal" @click="setReportInfo('댓글', commentInfo.objectId)">
+              <img class="comment-report-img" src="@/assets/img/exclamation.svg" alt="">
+            </button>
+          </template>
 
           <div class="comment-content">
             {{ commentInfo.content }}
@@ -95,7 +100,7 @@
               <span v-if="commentInfo.like > 0" class="like">{{ convertNumberUnit(commentInfo.like) }}</span>
             </div>
 
-            <span class="reply-comment" @click="showInputBoxSubCommentIndex = index">답글</span>
+            <span @click="showSubCommentInputBox(index)" class="reply-comment">답글</span>
             <span v-if="commentInfo.subCommentCount > 0" class="subcomment-info-text" @click="loadSubComment(commentInfo.objectId)">
               {{ showSubCommentIdBundleList.includes(commentInfo.objectId) ? 
               `${commentInfo.subCommentCount}개의 답글 숨기기` :
@@ -119,14 +124,17 @@
                   {{ getCommentDate(subCommentInfo.createdDate) }}
                 </div>
                 
-                <button v-if="subCommentInfo.isMine" 
-                :id="'deleteCommentButton' + subCommentInfo.objectId" type="button" class="close" aria-label="Close" 
-                @click="deleteComment(subCommentInfo)" data-toggle="modal" data-target="#exampleModal">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                <button v-else class="close" data-toggle="modal" data-target="#reportUserModal" @click="setReportInfo('댓글', subCommentInfo.objectId)">
-                  <img class="comment-report-img" src="@/assets/img/exclamation.svg" alt="">
-                </button>
+                <template v-if="$global.isLogin">
+                  <button v-if="subCommentInfo.isMine" 
+                  :id="'deleteCommentButton' + subCommentInfo.objectId" type="button" class="close" aria-label="Close" 
+                  @click="deleteComment(subCommentInfo)" data-toggle="modal" data-target="#exampleModal">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <button v-else class="close" data-toggle="modal" data-target="#reportUserModal" @click="setReportInfo('댓글', subCommentInfo.objectId)">
+                    <img class="comment-report-img" src="@/assets/img/exclamation.svg" alt="">
+                  </button>
+                </template>
+                
                 <div class="comment-content">
                   {{ subCommentInfo.content }}
                 </div>
@@ -184,6 +192,13 @@ export default {
     }
   },
   methods: {
+    showSubCommentInputBox: function (index) {
+      if (!this.$global.isLogin) {
+        alert('로그인 후 이용해주세요.')
+        return
+      }
+      this.showInputBoxSubCommentIndex = index
+    },
     setReportInfo: function (target, reportTargetId) {
       this.reportInfo.target = target
 
@@ -378,6 +393,8 @@ export default {
       })
     },
     evaluateBoard: function (isLike) {
+      if (!this.$global.isLogin) return
+
       let postBody = {
         isLike: isLike
       }

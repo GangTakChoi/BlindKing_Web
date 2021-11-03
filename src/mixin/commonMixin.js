@@ -3,7 +3,6 @@ import VueCookies from 'vue-cookies'
 let commonMixin = {
   data () {
     return {
-      isAdmin: false,
     }
   },
   methods: {
@@ -83,8 +82,6 @@ let commonMixin = {
     },
   },
   created () {
-    this.isAdmin = VueCookies.get('roleName') === 'admin' ? true : false
-
     // 뒤로가기 이벤트
     window.onpopstate = function(event) {
       let nowDate = new Date();

@@ -1,6 +1,6 @@
 <template>
   <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -51,15 +51,21 @@ export default {
       }
       this.$http.post('/user/login', reqBody).then((response) => {
         if (response.status === 201) {
-          alert('로그인 성공')
           this.$global.isLogin = true
+          this.$global.isAdmin = response.data.userInfo.isAdmin
+          this.$global.isActiveMatching = response.data.userInfo.isActiveMatching
+          
+          alert('로그인 성공')
           this.$emit('loginSuccess')
-          $('#close').trigger('click')
-          this.$router.push('/');
+          $('#loginModal #close').trigger('click')
+
+          if (this.$route.name === 'Signup') this.$router.push('/')
         }
       }).catch((error) => {
-        alert(error.response.data.errorMessage)
         console.log(error);
+        alert(error.response.data.errorMessage)
+      }).finally(() => {
+        this.$global.isLoading = false
       })
     },
   },

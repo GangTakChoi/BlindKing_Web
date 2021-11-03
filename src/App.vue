@@ -13,7 +13,7 @@
 
       <div class="login-wrap">
         <div v-if="!$global.isLogin">
-          <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModal">
+          <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#loginModal">
             로그인
           </button>
         </div>
@@ -50,7 +50,6 @@ export default {
   components: { LoginModal, ToastPopup },
   data: () => {
     return {
-      isHome: Boolean,
       socket: Object,
       alimInfo: {
         nickname: 'test',
@@ -65,6 +64,9 @@ export default {
       if (this.$route.name === 'ChattingRoom') return false
 
       return true
+    },
+    isHome: function () {
+      return this.$route.name === 'Home' ? true : false
     },
   },
   methods: {
@@ -94,23 +96,23 @@ export default {
       })
     },
     logout: function () {
+      if (!confirm('로그아웃 하시겠습니까?')) return
       VueCookies.remove('token')
-      alert('로그아웃 완료')
+
+      if (this.$route.name === 'Community'
+      || this.$route.name === 'CommunityView'
+      || this.$route.name === 'Home') {
+        location.reload()
+        return
+      }
+
       window.location.href = "/"
     },
     goBack: function () {
       history.back()
     },
-    refreshIsHome: function () {
-      this.isHome = window.location.pathname === "/" ? true : false
-    },
-  },
-  updated () {
-    this.refreshIsHome()
   },
   async created () {
-    this.refreshIsHome()
-
     this.$global.isMobile = window.innerWidth <= 768
 
     const TOKEN = VueCookies.get('token');
@@ -121,12 +123,19 @@ export default {
         
         if (response.status === 200) {
           this.$global.isLogin = true
+          this.$global.isAdmin = response.data.userInfo.isAdmin
+          this.$global.isActiveMatching = response.data.userInfo.isActiveMatching
+          
           this.chattingAlimSocketConnect()
         }
       } catch (error) {
         alert(error.response.data.errorMessage)
         console.log(error)
+      } finally {
+        this.$global.isLoading = false
       }
+    } else {
+      this.$global.isLoading = false
     }
   },
 }
