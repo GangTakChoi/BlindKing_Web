@@ -52,7 +52,7 @@
       </button>
 
       <button @click="movePage('친구목록')" class="basic-button-design shadow-sm rounded" :disabled="!$global.isLogin">
-        친구목록
+        친구 목록
       </button>
 
       <button @click="movePage('커뮤니티')" class="basic-button-design shadow-sm rounded">

@@ -14,14 +14,13 @@
     
     <div class="friend-list-wrap" v-if="this.pageCode === FRIEND_PAGE">
       <div class="friend-info-row" v-for="(friendInfo, key) in friendAcceptList" :key="key" @click="moveFriendDetailPage(friendInfo.objectId)">
-      <!-- <div class="friend-info-row" v-for="(friendInfo, key) in friendAcceptList" :key="key"> -->
         <span class="nickname-section">
           {{friendInfo.nickname}}
         </span>
         
         <div class="friend-row-button-wrap chatting">
-          <span v-if="friendInfo.isUnReadMessage" class="unread-alarm blinking"></span>
-          <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, key, $event)">
+          <!-- <span v-if="friendInfo.isUnReadMessage" class="unread-alarm blinking"></span> -->
+          <button type="button" class="btn btn-primary" :class="{ 'blinking': friendInfo.isUnReadMessage }" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, key, $event)">
             대화방
           </button>
         </div>
