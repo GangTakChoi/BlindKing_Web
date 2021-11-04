@@ -336,10 +336,10 @@ export default {
 
 <style lang="scss" scoped>
 .question-answer-section {
-  max-height: 400px;
+  max-height: 700px;
   overflow: auto;
   margin-bottom: 12px;
-  padding-right: 5px;
+  padding: 3px;
 }
 .content-container {
   font-size: 17px;
@@ -460,15 +460,18 @@ export default {
   position: relative;
   display: inline-block;
   margin-bottom: 7px;
-  width: 33%;
+  width: 49.7%;
   padding: 10px;
   border-radius: 6px;
   background-color: #fff;
   box-shadow: 0px 1px 5px -2px;
 }
+.partner-card-body:not(:last-child) {
+  margin-bottom: 12px;
+}
 .table {
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 }
 .question-section {
   font-weight: bold;
@@ -479,6 +482,7 @@ export default {
   word-break: break-all;
   background-color:#f9f9f9;
   border: 1px solid #d8d6d6;
+  margin-bottom: 0;
   padding: 10px;
 }
 

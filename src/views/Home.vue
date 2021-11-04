@@ -71,11 +71,9 @@
         질문관리
       </button>
 
-      <a href="https://toon.at/donate/637662824189086998" target="_blank">
-        <button class="basic-button-design shadow-sm rounded">
-          후원하기
-        </button>
-      </a>
+      <button @click="moveDonatePage" class="basic-button-design shadow-sm rounded">
+        후원하기
+      </button>
 
       <!-- <router-link to="/test">
         <button class="basic-button-design shadow-sm rounded">
@@ -109,6 +107,9 @@ export default {
     }
   },
   methods: {
+    moveDonatePage: function () {
+      window.open('https://toon.at/donate/637662824189086998')
+    },
     movePage: function (type) {
       if (type === '자기소개') this.$router.push('/self-introduction')
       else if (type === '인연찾기') this.$router.push('/matching')
@@ -117,7 +118,6 @@ export default {
       else if (type === '내정보') this.$router.push('/mypage')
       else if (type === '신고관리') this.$router.push('/report')
       else if (type === '질문관리') this.$router.push('/manage-question')
-
     },
     useTopDisplay: function () {
       this.$http.put('/user/matching-top-display')
@@ -220,7 +220,7 @@ export default {
 }
 .basic-button-design {
   display: block;
-  margin: 20px auto 0 auto;
+  margin: 0 auto;
   border: solid 0px #000;
   width: 100%;
   max-width: 1000px;
@@ -230,6 +230,9 @@ export default {
   transition-duration: 0.4s;
   box-shadow: 1px 1px 6px -2px black;
   background-color: #fff;
+}
+.basic-button-design:not(:first-child) {
+  margin-top: 20px;
 }
 .on-off-button {
   position: relative;
@@ -272,24 +275,6 @@ export default {
   font-size:16px;
   font-weight:normal;
   color: red;
-}
-
-.blinking {
-  -webkit-animation:blink 1.0s ease-in-out infinite alternate;
-  -moz-animation:blink 1.0s ease-in-out infinite alternate;
-  animation:blink 1.0s ease-in-out infinite alternate;
-}
-@-webkit-keyframes blink {
-  0% {opacity:0.3;}
-  100% {opacity:1;}
-}
-@-moz-keyframes blink {
-  0% {opacity:0.3;}
-  100% {opacity:1;}
-}
-@keyframes blink {
-  0% {opacity:0.3;}
-  100% {opacity:1;}
 }
 
 @media (max-width: 768px) {

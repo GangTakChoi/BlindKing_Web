@@ -20,7 +20,7 @@
         </span>
         
         <div class="friend-row-button-wrap chatting">
-          <span v-if="friendInfo.isUnReadMessage" class="unread-count-info">{{ '*' }}</span>
+          <span v-if="friendInfo.isUnReadMessage" class="unread-alarm blinking"></span>
           <button type="button" class="btn btn-primary" @click="moveChattingRoom(friendInfo.objectId, friendInfo.nickname, key, $event)">
             대화방
           </button>
@@ -247,12 +247,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.unread-count-info {
+.unread-alarm {
+  position: relative;
+  top: -1px;
+  right: 14px;
   display: inline-block;
   vertical-align: middle;
-  padding: 2px 13px;
-  border-radius: 10px;
-  margin-right: 14px;
+  padding: 6px;
+  border-radius: 50%;
   background-color: #fd5f5f;
   color: #ffffff;
 }
@@ -333,10 +335,6 @@ export default {
 
 
 @media (max-width: 768px) {
-  .unread-count-info {
-    padding: 3px 14px 4px 14px;
-    font-size: 14px;
-  }
   .basic-design {
     font-size: 16px;
     width: 30%;
