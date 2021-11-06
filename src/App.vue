@@ -52,8 +52,8 @@ export default {
     return {
       socket: Object,
       alimInfo: {
-        nickname: 'test',
-        message: 'test',
+        nickname: '',
+        message: '',
       }
     }
   },
@@ -113,6 +113,9 @@ export default {
     },
   },
   async created () {
+    if (process.env.VUE_APP_MODE === 'dev') console.log(`[mode:${process.env.VUE_APP_MODE}]`)
+    
+
     this.$global.isMobile = window.innerWidth <= 768
 
     const TOKEN = VueCookies.get('token');

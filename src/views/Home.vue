@@ -1,7 +1,7 @@
 <template>
   <div class="content-container">
     <div v-if="!$global.isLogin && !$global.isLoading">
-      <div class="jumbotron jumbotron-fluid rounded" @click="test">
+      <div class="jumbotron jumbotron-fluid rounded">
         <div class="container">
           <h1 class="display-5">안녕하세요, BlindKing 입니다.</h1>
           <pre class="lead">
