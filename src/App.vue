@@ -115,11 +115,11 @@ export default {
     if (process.env.VUE_APP_MODE === 'dev') console.log(`[mode:${process.env.VUE_APP_MODE}]`)
     
     this.$global.isMobile = window.innerWidth <= 768
-
     const TOKEN = this.$cookies.get('token');
 
     if (TOKEN) {
       try {
+        this.$http.defaults.headers.common['Authorization'] = `Bearer ${TOKEN}`
         let response = await this.$http.get('/verify-token')
         
         if (response.status === 200) {

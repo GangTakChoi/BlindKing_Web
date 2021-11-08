@@ -60,6 +60,8 @@ export default {
           this.$cookies.set('nickname', response.data.userInfo.nickname)
           this.$cookies.set('matchingTopDisplayUseingTime', response.data.userInfo.matchingTopDisplayUseingTime)
           
+          this.$http.defaults.headers.common['Authorization'] = `Bearer ${response.data.userInfo.token}`;
+
           alert('로그인 성공')
           this.$emit('loginSuccess')
           $('#loginModal #close').trigger('click')
