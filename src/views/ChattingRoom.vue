@@ -40,16 +40,14 @@
 <script>
 import io from '@/assets/js/socket.io.js'
 import ReportUserModal from '@/components/ReportUserModal.vue'
-import VueCookies from 'vue-cookies'
-
-const TOKEN = VueCookies.get('token');
-const NICKNAME = VueCookies.get('nickname');
 
 export default {
   name: "ChattingRoom",
   components: { ReportUserModal },
   data: () => {
     return {
+      token: '',
+      nickname: '',
       messageList: [],
       message: "",
       socket: {},
@@ -71,7 +69,7 @@ export default {
       }
 
       let msgInfo = {
-        nickname: NICKNAME,
+        nickname: this.nickname,
         msg: this.message
       }
 
@@ -83,11 +81,14 @@ export default {
     }
   },
   created () {
+    this.token = this.$cookies.get('token')
+    this.nickname = this.$cookies.get('nickname')
+
     this.socket = io(process.env.VUE_APP_BASE_API_HOST + '/chatting')
 
     this.socket.on("connectSuccess", () => {
       let data = {
-        myToken: TOKEN,
+        myToken: this.token,
         friendObjectId: this.$route.params.friendObjectId
       }
 
@@ -106,7 +107,7 @@ export default {
       }
 
       await data.messageRecords.forEach((messaeInfo) => {
-        let myGender = VueCookies.get('gender')
+        let myGender = this.$cookies.get('gender')
         let yourGender = myGender === 'male' ? 'female' : 'male'
         
         let isMe = messaeInfo.userObjectId === data.myObjectId  ? true : false
@@ -123,9 +124,9 @@ export default {
     })
 
     this.socket.on("brodcastMessage", async (data) => {
-      let myGender = VueCookies.get('gender')
+      let myGender = this.$cookies.get('gender')
       let yourGender = myGender === 'male' ? 'female' : 'male'
-      let isMe = data.nickname === NICKNAME ? true : false
+      let isMe = data.nickname === this.nickname ? true : false
 
       let msgInfo = {
         isMe: isMe,

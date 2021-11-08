@@ -85,8 +85,6 @@
 </template>
 
 <script>
-import VueCookies from 'vue-cookies'
-
 export default {
   name: 'Home',
   data: () => {
@@ -124,9 +122,13 @@ export default {
       .then((response) => {
         alert('매칭 상위 노출이 완료되었습니다!')
         this.isBlockUseTopMatchingDisplay = true
+        this.$cookies.set('matchingTopDisplayUseingTime', response.data.matchingTopDisplayUseingTime)
         this.displayReUseWaitingTime()
       })
       .catch((error) => {
+        if (error.response.data.matchingTopDisplayUseingTime !== undefined) {
+          this.$cookies.set('matchingTopDisplayUseingTime', error.response.data.matchingTopDisplayUseingTime)
+        }
         alert(error.response.data.errorMessage)
       })
     },
@@ -136,6 +138,7 @@ export default {
       this.$http.put('/user/active-matching')
       .then((response) => {
         this.$global.isActiveMatching = response.data.isActiveMatching
+        this.$cookies.set('matchingTopDisplayUseingTime', response.data.matchingTopDisplayUseingTime)
 
         if (this.$global.isActiveMatching) {
           alert("매칭이 활성화 되었습니다.")
@@ -156,7 +159,7 @@ export default {
       })
     },
     displayReUseWaitingTime: function () {
-      let matchingTopDisplayUseingTime = Number(VueCookies.get('matchingTopDisplayUseingTime'))
+      let matchingTopDisplayUseingTime = Number(this.$cookies.get('matchingTopDisplayUseingTime'))
       // 상위노출 재사용 대기 시간 설정 (시간단위 값 설정)
       let reuseLatencyHours = 4
 

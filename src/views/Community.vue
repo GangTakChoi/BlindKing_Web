@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import VueCookies from 'vue-cookies'
 import AddCategoryModel from '@/components/AddCategoryModel.vue'
 import SettingCategory from '@/components/SettingCategory.vue'
 

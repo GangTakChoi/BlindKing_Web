@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import store from './store'
+import VueCookies from 'vue-cookies'
 import commonMixin from '@/mixin/commonMixin'
 
 // 전역 변수 등록
@@ -25,6 +26,10 @@ Vue.prototype.$http = axios.create({
 });
 
 Vue.config.productionTip = false
+
+Vue.use(VueCookies)
+Vue.$cookies.config('0')
+
 Vue.mixin(commonMixin)
 
 new Vue({

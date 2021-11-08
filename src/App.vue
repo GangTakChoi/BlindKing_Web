@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import VueCookies from 'vue-cookies'
 import './assets/bootstrap-4.6.0/js/bootstrap.bundle.min.js'
 import LoginModal from '@/components/LoginModal.vue'
 import ToastPopup from '@/components/ToastPopup.vue'
@@ -73,7 +72,7 @@ export default {
     chattingAlimSocketConnect: function () {
       this.socket = io(process.env.VUE_APP_BASE_API_HOST + '/chatting-alim')
 
-      const TOKEN = VueCookies.get('token');
+      const TOKEN = this.$cookies.get('token');
 
       this.socket.emit('alimRoomOpen', TOKEN)
 
@@ -97,7 +96,7 @@ export default {
     },
     logout: function () {
       if (!confirm('로그아웃 하시겠습니까?')) return
-      VueCookies.remove('token')
+      this.$cookies.remove('token')
 
       if (this.$route.name === 'Community'
       || this.$route.name === 'CommunityView'
@@ -115,10 +114,9 @@ export default {
   async created () {
     if (process.env.VUE_APP_MODE === 'dev') console.log(`[mode:${process.env.VUE_APP_MODE}]`)
     
-
     this.$global.isMobile = window.innerWidth <= 768
 
-    const TOKEN = VueCookies.get('token');
+    const TOKEN = this.$cookies.get('token');
 
     if (TOKEN) {
       try {

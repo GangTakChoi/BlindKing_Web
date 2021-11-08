@@ -143,7 +143,6 @@
 
 <script>
 // @ is an alias to /src
-import VueCookies from 'vue-cookies'
 import $ from 'jquery'
 
 export default {

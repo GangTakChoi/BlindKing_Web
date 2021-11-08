@@ -130,8 +130,6 @@
 </template>
 
 <script>
-import VueCookies from 'vue-cookies'
-
 const LOAD_LIMIT = 10
 
 export default {
@@ -230,8 +228,8 @@ export default {
       })
     },
     loadData () {
-      this.nickname = VueCookies.get('nickname')
-      this.gender = VueCookies.get('gender') === 'male' ? '남성' : '여성'
+      this.nickname = this.$cookies.get('nickname')
+      this.gender = this.$cookies.get('gender') === 'male' ? '남성' : '여성'
 
       this.$http.get('/user/mypage?type=board,comment')
       .then((response) => {

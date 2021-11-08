@@ -1,5 +1,3 @@
-import VueCookies from 'vue-cookies'
-
 let commonMixin = {
   data () {
     return {
