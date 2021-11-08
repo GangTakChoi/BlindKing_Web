@@ -231,7 +231,7 @@ export default {
       this.nickname = this.$cookies.get('nickname')
       this.gender = this.$cookies.get('gender') === 'male' ? '남성' : '여성'
 
-      this.$http.get('/user/mypage?type=board,comment')
+      this.$http.get('/user/mypage?type=board,comment', { headers: {'Authorization': 'test'} })
       .then((response) => {
         this.boardList = response.data.boardList
         this.commentList = response.data.commentList
