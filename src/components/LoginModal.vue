@@ -34,6 +34,7 @@
 
 <script>
 import $ from 'jquery'
+import VueCookies from 'vue-cookies'
 
 export default {
   name: "LoginModal",
@@ -54,6 +55,8 @@ export default {
           this.$global.isLogin = true
           this.$global.isAdmin = response.data.userInfo.isAdmin
           this.$global.isActiveMatching = response.data.userInfo.isActiveMatching
+
+          VueCookies.set('token', response.data.userInfo.token)
           
           alert('로그인 성공')
           this.$emit('loginSuccess')
