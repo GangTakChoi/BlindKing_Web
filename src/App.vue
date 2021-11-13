@@ -120,6 +120,7 @@ export default {
     if (TOKEN) {
       try {
         this.$http.defaults.headers.common['Authorization'] = `Bearer ${TOKEN}`
+        
         let response = await this.$http.get('/verify-token')
         
         if (response.status === 200) {

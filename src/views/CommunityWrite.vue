@@ -22,6 +22,9 @@
 <script>
 import ClassicEditor from '@/assets/js/ckeditor';
 import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueCookies from 'vue-cookies'
+
+const TOKEN = VueCookies.get('token')
 
 export default {
   name: "CommunityWrite",
@@ -72,7 +75,7 @@ export default {
             // Headers sent along with the XMLHttpRequest to the upload server.
             headers: {
                 // 'X-CSRF-TOKEN': 'CSRF-Token',
-                // Authorization: 'Bearer <JSON Web Token>'
+                Authorization: `Bearer ${TOKEN}`
             }
         }
       }

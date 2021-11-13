@@ -308,7 +308,8 @@ export default {
 
         this.isShowMoreButton = (response.data.userList.length >= PARTNER_LIST_COUNT) ? true : false
       } catch (error) {
-        alert('페이지 로드중 에러가 발생하였습니다.')
+        alert(error.response.data.errorMessage)
+        history.back()
       } finally {
         this.isShowLoading = false
         this.isShowPartnerList = true
