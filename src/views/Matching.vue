@@ -317,18 +317,17 @@ export default {
     }
   },
   async created () {
-    try {
-      if ( this.getIsHistoryBack() ) {
-        Object.assign(this.$data, JSON.parse(this.getCache()))
-      } else {
-        await this.search('initial')
-      }
-    } catch (error) {
-      alert('페이지 로딩중 문제가 발생하였습니다.')
-      console.log(error)
+    // 뒤로가기 페이지인 경우
+    if ( this.getIsHistoryBack() ) {
+      // 캐시 로드
+      Object.assign(this.$data, JSON.parse(this.getCache()))
+    } else {
+      // 데이터 요청
+      await this.search('initial')
     }
   },
   beforeRouteLeave (to, from, next) {
+    // 페이지 떠나기 전 캐시 저장
     this.saveCache(this.$data)
     next()
   }

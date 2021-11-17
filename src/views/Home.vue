@@ -70,9 +70,9 @@
         질문관리
       </button>
 
-      <button @click="moveDonatePage" class="basic-button-design shadow-sm rounded">
+      <!-- <button @click="moveDonatePage" class="basic-button-design shadow-sm rounded">
         후원하기
-      </button>
+      </button> -->
 
       <!-- <router-link to="/test">
         <button class="basic-button-design shadow-sm rounded">
