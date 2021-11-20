@@ -110,35 +110,41 @@ export default {
     goBack: function () {
       history.back()
     },
+    setConfig: function () {
+      this.$global.isMobile = window.innerWidth <= 768
+    },
+    loadUserInfo: function () {
+      const TOKEN = this.$cookies.get('token');
+
+      // 비회원 상태
+      if (!TOKEN) {
+        this.$global.isLoadingUserInfo = false
+        return
+      }
+
+      this.$http.defaults.headers.common['Authorization'] = `Bearer ${TOKEN}`
+
+      this.$http.get('/verify-token')
+      .then((response) => {
+        this.$global.isLogin = true
+        this.$global.isAdmin = response.data.userInfo.isAdmin
+        this.$global.isActiveMatching = response.data.userInfo.isActiveMatching
+        
+        this.chattingAlimSocketConnect()
+      })
+      .catch((error) => {
+        console.log(error)
+        alert(error.response.data.errorMessage)
+      })
+      .finally(() => {
+        this.$global.isLoadingUserInfo = false
+      })
+    },
   },
   async created () {
     if (process.env.VUE_APP_MODE === 'dev') console.log(`[mode:${process.env.VUE_APP_MODE}]`)
-    
-    this.$global.isMobile = window.innerWidth <= 768
-    const TOKEN = this.$cookies.get('token');
-
-    if (TOKEN) {
-      try {
-        this.$http.defaults.headers.common['Authorization'] = `Bearer ${TOKEN}`
-        
-        let response = await this.$http.get('/verify-token')
-        
-        if (response.status === 200) {
-          this.$global.isLogin = true
-          this.$global.isAdmin = response.data.userInfo.isAdmin
-          this.$global.isActiveMatching = response.data.userInfo.isActiveMatching
-          
-          this.chattingAlimSocketConnect()
-        }
-      } catch (error) {
-        alert(error.response.data.errorMessage)
-        console.log(error)
-      } finally {
-        this.$global.isLoading = false
-      }
-    } else {
-      this.$global.isLoading = false
-    }
+    this.setConfig()
+    this.loadUserInfo()
   },
 }
 </script>

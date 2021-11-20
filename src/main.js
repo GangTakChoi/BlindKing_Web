@@ -12,7 +12,7 @@ Vue.prototype.$global = Vue.observable({
   isMobile: Boolean,
   isAdmin: false,
   isActiveMatching: false,
-  isLoading: true,
+  isLoadingUserInfo: true,
 })
 
 // http request config
