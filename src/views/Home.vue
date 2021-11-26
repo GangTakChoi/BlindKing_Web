@@ -1,6 +1,6 @@
 <template>
   <div class="content-container">
-    <div v-if="!$global.isLogin && !$global.isLoadingUserInfo" class="greeting-panel shadow">
+    <div v-if="!$global.isLogin && !$global.isLoadingUserInfo" class="greeting-panel shadow-sm">
       <h3 class="greeting-title">안녕하세요, BlindKing 입니다.</h3>
       <!-- <hr> -->
       <pre class="greeting-content">
@@ -202,7 +202,7 @@ export default {
   white-space: pre-line;
   font-size: 18px;
   margin: 0;
-  margin-top: 20px;
+  margin-top: 26px;
   color: #696969;
 }
 .greeting-panel { 
@@ -212,14 +212,17 @@ export default {
   background-color: #ffffff;
   padding: 25px;
   border-radius: 20px;
+  text-align: center;
 }
 @media (max-width: 768px) {
   .greeting-content {
     font-size: 16px;
+    margin-top: 20px;
   }
   .greeting-panel {
     padding: 17px;
     margin-bottom: 36px;
+    text-align: left;
   }
   .greeting-title {
     font-size: 22px;
