@@ -1,22 +1,20 @@
 <template>
   <div class="content-container">
-    <div v-if="!$global.isLogin && !$global.isLoadingUserInfo">
-      <div class="jumbotron jumbotron-fluid rounded">
-        <div class="container">
-          <h1 class="display-5">안녕하세요, BlindKing 입니다.</h1>
-          <pre class="lead">
-            이 싸이트는 완전 무료 소개팅을 목적으로 만들어졌습니다.
-            기존 유료로 사용되는 소개팅을 이용해 본 적이 있고
-            "과연 돈이 개입된 시스템에서 남녀간의 순수한 만남이 가능할까?" 라는 생각을 하였고
-            완전 무료인 소개팅 서비스가 있었으면 좋겠다 라는 마음로 제작하게 된 싸이트입니다.
+    <div v-if="!$global.isLogin && !$global.isLoadingUserInfo" class="greeting-panel shadow">
+      <h3 class="greeting-title">안녕하세요, BlindKing 입니다.</h3>
+      <!-- <hr> -->
+      <pre class="greeting-content">
+        이 사이트는 완전 무료 소개팅을 목적으로 만들어졌습니다.
+        
+        제작자인 저는 기존 유료로 사용되는 소개팅을 이용해 본 적이 있었고
+        "과연 돈이 개입된 시스템에서 남녀간의 순수한 만남이 가능할까?" 라는 생각을 하였고
+        "완전 무료 소개팅 서비스가 있었으면 좋겠다" 라는 마음으로 제작하게 된 사이트입니다.
 
-            또한 제작자인 저의 취향으로 오직 그 사람이 어떤 가치, 감정을 추구하는 사람인지
-            아는 것에 초점을 맞추서 제작되어 본인 사진은 등록할 수 없다는 점 참고해주세요.
+        또한 제작자인 저의 취향으로 오직 그 사람이 어떤 가치, 감정을 추구하는 사람인지
+        아는 것에 초점을 맞추서 제작되어 본인 사진은 등록할 수 없다는 점 참고해주세요.
 
-            커뮤니티의 건의사항 게시판을 통해 많은 피드백과 아이디어 부탁드립니다.
-          </pre>
-        </div>
-      </div>
+        커뮤니티의 건의사항 게시판을 통해 많은 피드백과 아이디어 부탁드립니다.
+      </pre>
     </div>
 
     <div>
@@ -200,6 +198,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.greeting-content {
+  white-space: pre-line;
+  font-size: 18px;
+  margin: 0;
+  margin-top: 20px;
+  color: #696969;
+}
+.greeting-panel { 
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto 50px auto;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 20px;
+}
+@media (max-width: 768px) {
+  .greeting-content {
+    font-size: 16px;
+  }
+  .greeting-panel {
+    padding: 17px;
+    margin-bottom: 36px;
+  }
+  .greeting-title {
+    font-size: 22px;
+  }
+}
 .basic-button-design:disabled {
   opacity: 0.4;
   cursor: default;
@@ -207,18 +232,6 @@ export default {
 .disabled {
   opacity: 0.4;
   cursor: default;
-}
-.lead {
-  margin-top: 50px;
-  font-size: 1.3rem;
-  white-space: pre-line;
-}
-.jumbotron-fluid {
-  padding-left: 20px;
-  padding-right: 20px;
-  max-width: 1000px;
-  margin: 0 auto 50px auto;
-  background-color: #dae0e5;
 }
 .basic-button-design {
   display: block;
